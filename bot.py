@@ -14,14 +14,17 @@ API_KEY = "5371570532:AAEWry3st7_CFoQo7hJwwehMJvkD0NR-P9Q"
 
 def start(update: Update, context: CallbackContext):
     update.message.reply_text(
-        "Hello there, Welcome to the Bot.Please write\
-    /help to see the commands available.")
+        "Hello there, Welcome to the Bot.Please write /help to see the commands available.")
 
 
 def help(update: Update, context: CallbackContext):
     update.message.reply_text(
-        """Available Commands :-
-	/youtube - To get the youtube URL"""
+        """
+    Available Commands:
+	/youtube - To get the youtube URL
+    /echo - Echo message
+    /id - Display user id
+    """
     )
 
 
