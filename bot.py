@@ -2,20 +2,16 @@ from tkinter import Button
 from telegram import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext.updater import Updater
 from telegram.update import Update
-from telegram.ext.callbackcontext import CallbackContext
-from telegram.ext.commandhandler import CommandHandler
-from telegram.ext.messagehandler import MessageHandler
-from telegram.ext.callbackqueryhandler import CallbackQueryHandler
-from telegram.ext.filters import Filters
-
+from telegram.ext import CallbackContext, CommandHandler, MessageHandler
+from telegram.ext import CallbackQueryHandler, Filters, ContextTypes
 
 API_KEY = "5371570532:AAEWry3st7_CFoQo7hJwwehMJvkD0NR-P9Q"
 
 
 def start(update: Update, context: CallbackContext):
     update.message.reply_text(
-        "Hello there, Welcome to the Bot.Please write /help to see the commands available.")
 
+        "Hello there, Welcome to the Bot.Please write /help to see the commands available.")
 
 def help(update: Update, context: CallbackContext):
     update.message.reply_text(
@@ -50,30 +46,23 @@ def user_id(update, context):
     update.message.reply_text(update.message.from_user.id)
 
 
-# def buttons(update, context):
-#     """Sends a message with three inline buttons attached."""
-#     keyboard = [
-#         [
-#             InlineKeyboardButton("Option 1", callback_data="1"),
-#             InlineKeyboardButton("Option 2", callback_data="2"),
-#         ],
-#         [InlineKeyboardButton("Option 3", callback_data="3")],
-#     ]
+def button(update: Update, context: CallbackContext) -> None:
+    keyboard = [[
+        InlineKeyboardButton("1", callback_data='1'),
+        InlineKeyboardButton("2", callback_data='2'),
+        InlineKeyboardButton("3",callback_data='3')]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text("Choose a number:", reply_markup=reply_markup)
 
-#     reply_markup = InlineKeyboardMarkup(keyboard)
-
-#     async update.message.reply_text("Please choose:", reply_markup=reply_markup)
-
-
-# def button(update, context):
-#     """Parses the CallbackQuery and updates the message text."""
-#     query = update.callback_query
-
-#     # CallbackQueries need to be answered, even if no notification to the user is needed
-#     # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
-#     await query.answer()
-
-#     await query.edit_message_text(text=f"Selected option: {query.data}")
+def buttons(update: Update, context: CallbackContext) -> None:
+    query = update.callback_query
+    query.answer()
+    if query.data == '1':
+        update.callback_query.message.edit_text("You win!")
+    elif query.data == '2':
+        update.callback_query.message.edit_text("Boo, wrong number")
+    elif query.data == '3':
+        update.callback_query.message.edit_text("Oops, you chose wrong")
 
 
 def main():
@@ -88,9 +77,8 @@ def main():
     dp.add_handler(CommandHandler('help', help))
     dp.add_handler(CommandHandler('echo', echo))
     dp.add_handler(CommandHandler('id', user_id))
-
-    # dp.add_handler(CommandHandler('buttons', buttons))
-    # dp.add_handler(CallbackQueryHandler(button))
+    dp.add_handler(CommandHandler('butt', button))
+    dp.add_handler(CallbackQueryHandler(buttons))
 
     # Filters out unknown commands
     dp.add_handler(MessageHandler(Filters.command, unknown))
