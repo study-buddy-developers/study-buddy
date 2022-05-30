@@ -122,13 +122,6 @@ def gender(update):
 
 
 def date(update):
-    # update.callback_query.message.reply_text(
-    #     update.callback_query.message.date.day)
-    # update.callback_query.message.reply_text(
-    #     update.callback_query.message.date.month)
-    # update.callback_query.message.reply_text(
-    #     update.callback_query.message.date.year)
-
     keyboard = []
 
     col = 0
