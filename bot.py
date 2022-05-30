@@ -1,17 +1,18 @@
-from tkinter import Button
+from sqlite3 import Date
 from telegram import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext.updater import Updater
 from telegram.update import Update
 from telegram.ext import CallbackContext, CommandHandler, MessageHandler
 from telegram.ext import CallbackQueryHandler, Filters, ContextTypes
+from datetime import datetime, timedelta
 
 API_KEY = "5371570532:AAEWry3st7_CFoQo7hJwwehMJvkD0NR-P9Q"
 
 
 def start(update: Update, context: CallbackContext):
     update.message.reply_text(
-
         "Hello there, Welcome to the Bot.Please write /help to see the commands available.")
+
 
 def help(update: Update, context: CallbackContext):
     update.message.reply_text(
@@ -20,6 +21,7 @@ def help(update: Update, context: CallbackContext):
 	/youtube - To get the youtube URL
     /echo - Echo message
     /id - Display user id
+    /begin - Start Study Buddy Telegram Bot
     """
     )
 
@@ -38,6 +40,13 @@ def unknown_text(update: Update, context: CallbackContext):
         "Sorry I can't recognize you , you said '%s'" % update.message.text)
 
 
+def test(update, context):
+    update.message.reply_text("this is a test")
+
+    # dp.remove_handler(MessageHandler(
+    #     Filters.regex("@u.nus.edu"), test))
+
+
 def echo(update, context):
     update.message.reply_text(update.message.text)
 
@@ -46,23 +55,119 @@ def user_id(update, context):
     update.message.reply_text(update.message.from_user.id)
 
 
-def button(update: Update, context: CallbackContext) -> None:
-    keyboard = [[
-        InlineKeyboardButton("1", callback_data='1'),
-        InlineKeyboardButton("2", callback_data='2'),
-        InlineKeyboardButton("3",callback_data='3')]]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text("Choose a number:", reply_markup=reply_markup)
+def begin(update, context):
+    first_time(update)
 
-def buttons(update: Update, context: CallbackContext) -> None:
+
+def first_time(update):
+    keyboard = [[
+        InlineKeyboardButton("Yes", callback_data="first_time_yes"),
+        InlineKeyboardButton("No", callback_data="first_time_no")]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.message.reply_text(
+        "Hi! Welcome to Study Buddy Telegram Bot! Is this your first time using this bot?", reply_markup=reply_markup)
+    return
+
+
+def permission(update):
+    keyboard = [[
+        InlineKeyboardButton("Allow", callback_data="permission_allow")]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.callback_query.message.reply_text(
+        "Welcome to StudyBuddy Telegram Bot! Before we begin, we would like to ask for your permission to record your telegram handle. All information will be kept confidential in this telegram bot.", reply_markup=reply_markup)
+    return
+
+
+def email(update):
+    update.callback_query.message.reply_text(
+        "Hi! Welcome to StudyBuddy Bot! To verify your identity, What is your NUS email? (ending with @u.nus.edu)")
+
+    # dp.add_handler(
+    #     MessageHandler(Filters.regex("@u.nus.edu"), test))
+
+    return
+
+
+def verification(update):
+    update.callback_query.message.reply_text(
+        "A verification code has been sent to your email, please check and enter the code here to complete the verification.")
+
+    return
+
+
+def initiate_or_join(update):
+    keyboard = [[
+        InlineKeyboardButton("Initiate", callback_data="initiate"),
+        InlineKeyboardButton("Join", callback_data="join")]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.callback_query.message.reply_text(
+        "Greetings! Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
+    return
+
+
+def gender(update):
+    keyboard = [[
+        InlineKeyboardButton("Male", callback_data="male"),
+        InlineKeyboardButton("Female", callback_data="female"),
+        InlineKeyboardButton("Prefer not to say", callback_data="gender_null")
+    ]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.callback_query.message.reply_text(
+        "What is your gender? (Note that you will not have a say in the gender of your study buddies if you choose ‘prefer not to say’)", reply_markup=reply_markup)
+    return
+
+
+def date(update):
+    update.callback_query.message.reply_text(
+        update.callback_query.message.date.day)
+    # update.callback_query.message.reply_text(
+    #     update.callback_query.message.date.month)
+    # update.callback_query.message.reply_text(
+    #     update.callback_query.message.date.year)
+
+    keyboard = [[
+        InlineKeyboardButton("Male", callback_data="1"),
+        InlineKeyboardButton("Female", callback_data="2"),
+        InlineKeyboardButton("Male", callback_data="3"),
+        InlineKeyboardButton("Female", callback_data="4"),
+        InlineKeyboardButton("Male", callback_data="5"),
+        InlineKeyboardButton("Female", callback_data="6"),
+        InlineKeyboardButton("Prefer not to say", callback_data="7")
+    ]]
+
+    return
+
+
+def handle_callback_query(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
     query.answer()
-    if query.data == '1':
-        update.callback_query.message.edit_text("You win!")
-    elif query.data == '2':
-        update.callback_query.message.edit_text("Boo, wrong number")
-    elif query.data == '3':
-        update.callback_query.message.edit_text("Oops, you chose wrong")
+
+    # first_time
+    if query.data == "first_time_yes":
+        permission(update)
+    elif query.data == "first_time_no":
+        initiate_or_join(update)
+
+    # permission
+    elif query.data == "permission_allow":
+        email(update)
+
+    # initiate_or_join
+    elif query.data == "initiate":
+        gender(update)
+    elif query.data == "join":
+        # for i in range(7):
+        #     update.callback_query.message.reply_text(
+        #         str((datetime.now() + timedelta(days=i)).day) + "/" + (datetime.now() + timedelta(days=i)).month + "/" + (datetime.now() + timedelta(days=i)).year)
+        date(update)
+
+    # gender
+    elif query.data == "male" or query.data == "female":
+        date(update)
 
 
 def main():
@@ -77,8 +182,9 @@ def main():
     dp.add_handler(CommandHandler('help', help))
     dp.add_handler(CommandHandler('echo', echo))
     dp.add_handler(CommandHandler('id', user_id))
-    dp.add_handler(CommandHandler('butt', button))
-    dp.add_handler(CallbackQueryHandler(buttons))
+    dp.add_handler(CommandHandler('begin', begin))
+
+    dp.add_handler(CallbackQueryHandler(handle_callback_query))
 
     # Filters out unknown commands
     dp.add_handler(MessageHandler(Filters.command, unknown))
