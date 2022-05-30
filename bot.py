@@ -122,23 +122,58 @@ def gender(update):
 
 
 def date(update):
-    update.callback_query.message.reply_text(
-        update.callback_query.message.date.day)
+    # update.callback_query.message.reply_text(
+    #     update.callback_query.message.date.day)
     # update.callback_query.message.reply_text(
     #     update.callback_query.message.date.month)
     # update.callback_query.message.reply_text(
     #     update.callback_query.message.date.year)
 
-    keyboard = [[
-        InlineKeyboardButton("Male", callback_data="1"),
-        InlineKeyboardButton("Female", callback_data="2"),
-        InlineKeyboardButton("Male", callback_data="3"),
-        InlineKeyboardButton("Female", callback_data="4"),
-        InlineKeyboardButton("Male", callback_data="5"),
-        InlineKeyboardButton("Female", callback_data="6"),
-        InlineKeyboardButton("Prefer not to say", callback_data="7")
-    ]]
+    keyboard = []
 
+    col = 0
+    row = -1
+
+    for i in range(7):
+        if col == 0:
+            keyboard.append([])
+            row += 1
+
+        curr_date = datetime.now() + timedelta(days=i)
+        curr_day = str(curr_date.day)
+        curr_month = str(curr_date.month)
+        curr_year = str(curr_date.year)
+
+        keyboard[row].append(InlineKeyboardButton(
+            curr_day + "/" + curr_month + "/" + curr_year, callback_data=str(i)))
+
+        col += 1
+        col %= 3
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.callback_query.message.reply_text(
+        "Please select your desired date for your study session", reply_markup=reply_markup)
+    return
+
+
+def time(update):
+    keyboard = [[
+        InlineKeyboardButton("Morning <1200", callback_data="morning"),
+        InlineKeyboardButton("Afternoon 1200<=x<=1800",
+                             callback_data="afternoon"),
+        InlineKeyboardButton("Evening >1800", callback_data="evening")
+    ]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.callback_query.message.reply_text(
+        "What time would you like to have your study session", reply_markup=reply_markup)
+    return
+
+
+def course(update):
+    update.callback_query.message.reply_text(
+        "What is your course?")
     return
 
 
@@ -160,14 +195,19 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     elif query.data == "initiate":
         gender(update)
     elif query.data == "join":
-        # for i in range(7):
-        #     update.callback_query.message.reply_text(
-        #         str((datetime.now() + timedelta(days=i)).day) + "/" + (datetime.now() + timedelta(days=i)).month + "/" + (datetime.now() + timedelta(days=i)).year)
-        date(update)
+        update.callback_query.message.reply_text("handle join")
 
     # gender
     elif query.data == "male" or query.data == "female":
         date(update)
+
+    # date
+    elif query.data == "1" or query.data == "2" or query.data == "3" or query.data == "4" or query.data == "5" or query.data == "6" or query.data == "7":
+        time(update)
+
+    # time
+    elif query.data == "morning" or query.data == "afternoon" or query.data == "evening":
+        course(update)
 
 
 def main():
