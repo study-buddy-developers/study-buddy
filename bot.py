@@ -1,12 +1,13 @@
-from sqlite3 import Date
-from telegram import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import ForceReply, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext.updater import Updater
 from telegram.update import Update
-from telegram.ext import CallbackContext, CommandHandler, MessageHandler
+from telegram.ext import ConversationHandler, CallbackContext, CommandHandler, MessageHandler
 from telegram.ext import CallbackQueryHandler, Filters, ContextTypes
 from datetime import datetime, timedelta
 
 API_KEY = "5371570532:AAEWry3st7_CFoQo7hJwwehMJvkD0NR-P9Q"
+
+EXPECT_EMAIL = range(1)
 
 
 def start(update: Update, context: CallbackContext):
@@ -56,10 +57,10 @@ def user_id(update, context):
 
 
 def begin(update, context):
-    first_time(update)
+    first_time(update, context)
 
 
-def first_time(update):
+def first_time(update, context):
     keyboard = [[
         InlineKeyboardButton("Yes", callback_data="first_time_yes"),
         InlineKeyboardButton("No", callback_data="first_time_no")]]
@@ -70,7 +71,7 @@ def first_time(update):
     return
 
 
-def permission(update):
+def permission(update, context):
     keyboard = [[
         InlineKeyboardButton("Allow", callback_data="permission_allow")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -80,24 +81,28 @@ def permission(update):
     return
 
 
-def email(update):
-    update.callback_query.message.reply_text(
-        "Hi! Welcome to StudyBuddy Bot! To verify your identity, What is your NUS email? (ending with @u.nus.edu)")
-
-    # dp.add_handler(
-    #     MessageHandler(Filters.regex("@u.nus.edu"), test))
-
-    return
+def email(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text="Hi! Welcome to StudyBuddy Bot! To verify your identity, What is your NUS email? (ending with @u.nus.edu)", reply_markup=ForceReply())
+    return EXPECT_EMAIL
 
 
-def verification(update):
+def email_input_by_user(update, context):
+    print('do you even run')
+    email = update.message.text
+    update.message.reply_text(email)
+
+    return ConversationHandler.END
+
+
+def verification(update, context):
     update.callback_query.message.reply_text(
         "A verification code has been sent to your email, please check and enter the code here to complete the verification.")
 
     return
 
 
-def initiate_or_join(update):
+def initiate_or_join(update, context):
     keyboard = [[
         InlineKeyboardButton("Initiate", callback_data="initiate"),
         InlineKeyboardButton("Join", callback_data="join")]]
@@ -108,7 +113,7 @@ def initiate_or_join(update):
     return
 
 
-def gender(update):
+def gender(update, context):
     keyboard = [[
         InlineKeyboardButton("Male", callback_data="male"),
         InlineKeyboardButton("Female", callback_data="female"),
@@ -121,7 +126,7 @@ def gender(update):
     return
 
 
-def date(update):
+def date(update, context):
     keyboard = []
 
     col = 0
@@ -150,7 +155,7 @@ def date(update):
     return
 
 
-def time(update):
+def time(update, context):
     keyboard = [[
         InlineKeyboardButton("Morning <1200", callback_data="morning"),
         InlineKeyboardButton("Afternoon 1200<=x<=1800",
@@ -164,7 +169,7 @@ def time(update):
     return
 
 
-def course(update):
+def course(update, context):
     update.callback_query.message.reply_text(
         "What is your course?")
     return
@@ -176,31 +181,39 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # first_time
     if query.data == "first_time_yes":
-        permission(update)
+        permission(update, context)
     elif query.data == "first_time_no":
-        initiate_or_join(update)
+        initiate_or_join(update, context)
 
     # permission
     elif query.data == "permission_allow":
-        email(update)
+        email(update, context)
 
     # initiate_or_join
     elif query.data == "initiate":
-        gender(update)
+        gender(update, context)
     elif query.data == "join":
         update.callback_query.message.reply_text("handle join")
 
     # gender
     elif query.data == "male" or query.data == "female":
-        date(update)
+        date(update, context)
 
     # date
     elif query.data == "1" or query.data == "2" or query.data == "3" or query.data == "4" or query.data == "5" or query.data == "6" or query.data == "7":
-        time(update)
+        time(update, context)
 
     # time
     elif query.data == "morning" or query.data == "afternoon" or query.data == "evening":
-        course(update)
+        course(update, context)
+
+    return
+
+
+def cancel(update: Update, context: CallbackContext):
+    update.message.reply_text(
+        "Name Conversation cancelled by user. Bye. Send /begin to start again")
+    return ConversationHandler.END
 
 
 def main():
@@ -219,10 +232,22 @@ def main():
 
     dp.add_handler(CallbackQueryHandler(handle_callback_query))
 
-    # Filters out unknown commands
-    dp.add_handler(MessageHandler(Filters.command, unknown))
-    # Filters out unknown messages.
-    dp.add_handler(MessageHandler(Filters.text, unknown_text))
+    conv_handler = ConversationHandler(
+        # TODO: find handler for entry_points
+        entry_points=[],
+        states={
+            EXPECT_EMAIL: [MessageHandler(
+                Filters.regex("@u.nus.edu"), email_input_by_user)]
+        },
+        fallbacks=[CommandHandler('cancel', cancel)]
+    )
+
+    dp.add_handler(conv_handler)
+
+# Filters out unknown commands
+##    dp.add_handler(MessageHandler(Filters.command, unknown))
+# Filters out unknown messages.
+##    dp.add_handler(MessageHandler(Filters.text, unknown_text))
 
     # Start the Bot
     updater.start_polling()
