@@ -12,23 +12,17 @@ EXPECT_TEXT = range(1)
 
 def start(update: Update, context: CallbackContext):
     update.message.reply_text(
-        "Hello there, Welcome to the Bot.Please write /help to see the commands available.")
+        "Hello there, Welcome to the Bot. Please write /help to see the commands available.")
 
 
 def help(update: Update, context: CallbackContext):
     update.message.reply_text(
         """
     Available Commands:
-	/youtube - To get the youtube URL
-    /echo - Echo message
     /id - Display user id
     /begin - Start Study Buddy Telegram Bot
     """
     )
-
-
-def youtube_url(update: Update, context: CallbackContext):
-    update.message.reply_text("Youtube Link =>https://www.youtube.com/")
 
 
 def unknown_command(update: Update, context: CallbackContext):
@@ -41,10 +35,6 @@ def unknown_text(update: Update, context: CallbackContext):
         "Sorry I can't recognize you , you said '%s'. Please use /begin to start again." % update.message.text)
 
 
-def echo(update, context):
-    update.message.reply_text(update.message.text)
-
-
 def user_id(update, context):
     update.message.reply_text(update.message.from_user.id)
 
@@ -54,9 +44,12 @@ def begin(update, context):
 
 
 def first_time(update, context):
-    keyboard = [[
-        InlineKeyboardButton("Yes", callback_data="first_time_yes"),
-        InlineKeyboardButton("No", callback_data="first_time_no")]]
+    keyboard = [
+        [
+            InlineKeyboardButton("Yes", callback_data="first_time_yes"),
+            InlineKeyboardButton("No", callback_data="first_time_no")
+        ]
+    ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.message.reply_text(
@@ -65,8 +58,11 @@ def first_time(update, context):
 
 
 def permission(update, context):
-    keyboard = [[
-        InlineKeyboardButton("Allow", callback_data="permission_allow")]]
+    keyboard = [
+        [
+            InlineKeyboardButton("Allow", callback_data="permission_allow")
+        ]
+    ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.callback_query.message.reply_text(
@@ -96,10 +92,12 @@ def code(update, context):
 
     if code == verification_code:
         # TODO: initiate_or_join
-        keyboard = [[
-            InlineKeyboardButton("Initiate", callback_data="initiate"),
-            InlineKeyboardButton("Join", callback_data="join")
-        ]]
+        keyboard = [
+            [
+                InlineKeyboardButton("Initiate", callback_data="initiate"),
+                InlineKeyboardButton("Join", callback_data="join")
+            ]
+        ]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         update.message.reply_text(
@@ -107,9 +105,11 @@ def code(update, context):
 
         return
     else:
-        keyboard = [[
-            InlineKeyboardButton("Resend", callback_data="resend")
-        ]]
+        keyboard = [
+            [
+                InlineKeyboardButton("Resend", callback_data="resend")
+            ]
+        ]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         update.message.reply_text(
@@ -125,9 +125,12 @@ def new_code(update, context):
 
 
 def initiate_or_join(update, context):
-    keyboard = [[
-        InlineKeyboardButton("Initiate", callback_data="initiate"),
-        InlineKeyboardButton("Join", callback_data="join")]]
+    keyboard = [
+        [
+            InlineKeyboardButton("Initiate", callback_data="initiate"),
+            InlineKeyboardButton("Join", callback_data="join")
+        ]
+    ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.callback_query.message.reply_text(
@@ -136,11 +139,14 @@ def initiate_or_join(update, context):
 
 
 def gender(update, context):
-    keyboard = [[
-        InlineKeyboardButton("Male", callback_data="male"),
-        InlineKeyboardButton("Female", callback_data="female"),
-        InlineKeyboardButton("Prefer not to say", callback_data="gender_null")
-    ]]
+    keyboard = [
+        [
+            InlineKeyboardButton("Male", callback_data="male"),
+            InlineKeyboardButton("Female", callback_data="female"),
+            InlineKeyboardButton("Prefer not to say",
+                                 callback_data="gender_null")
+        ]
+    ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.callback_query.message.reply_text(
@@ -178,10 +184,18 @@ def date(update, context):
 
 
 def time(update, context):
-    keyboard = [[InlineKeyboardButton("Morning <1200", callback_data="morning")],
-                [InlineKeyboardButton("Afternoon 1200<=x<=1800",
-                                      callback_data="afternoon")],
-                [InlineKeyboardButton("Evening >1800", callback_data="evening")]]
+    keyboard = [
+        [
+            InlineKeyboardButton("Morning <1200", callback_data="morning")
+        ],
+        [
+            InlineKeyboardButton("Afternoon 1200<=x<=1800",
+                                 callback_data="afternoon")
+        ],
+        [
+            InlineKeyboardButton("Evening >1800", callback_data="evening")
+        ]
+    ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.callback_query.message.reply_text(
@@ -224,12 +238,20 @@ def location(update, context):
 
 
 def pax(update, context):
-    keyboard = [[
-        InlineKeyboardButton("2", callback_data="pax_two")],
-        [InlineKeyboardButton("3", callback_data="pax_three")],
-        [InlineKeyboardButton("4", callback_data="pax_four")],
-        [InlineKeyboardButton("5", callback_data="pax_five")
-         ]]
+    keyboard = [
+        [
+            InlineKeyboardButton("2", callback_data="pax_two")
+        ],
+        [
+            InlineKeyboardButton("3", callback_data="pax_three")
+        ],
+        [
+            InlineKeyboardButton("4", callback_data="pax_four")
+        ],
+        [
+            InlineKeyboardButton("5", callback_data="pax_five")
+        ]
+    ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.message.reply_text(
@@ -261,9 +283,12 @@ def remark_yes(update, context):
 
 
 def store_data(update, context):
-    keyboard = [[
-        InlineKeyboardButton("Yes", callback_data="store_data_yes"),
-        InlineKeyboardButton("No", callback_data="store_data_no")]]
+    keyboard = [
+        [
+            InlineKeyboardButton("Yes", callback_data="store_data_yes"),
+            InlineKeyboardButton("No", callback_data="store_data_no")
+        ]
+    ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     if context.chat_data["state"] == "remark_done":
@@ -442,7 +467,7 @@ def handle_text(update, context):
 
 def cancel(update: Update, context: CallbackContext):
     update.message.reply_text(
-        "Conversation cancelled by user. Bye. Send /begin to start again")
+        "Conversation cancelled by user. Send /begin to start again.")
     return ConversationHandler.END
 
 
@@ -454,9 +479,7 @@ def main():
 
     # adding start command handler to dispatcher.
     dp.add_handler(CommandHandler('start', start))
-    dp.add_handler(CommandHandler('youtube', youtube_url))
     dp.add_handler(CommandHandler('help', help))
-    dp.add_handler(CommandHandler('echo', echo))
     dp.add_handler(CommandHandler('id', user_id))
     dp.add_handler(CommandHandler('begin', begin))
     dp.add_handler(CommandHandler('cancel', cancel))
