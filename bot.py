@@ -282,12 +282,19 @@ def store_data(update, context):
 def which_data(update, context):  # btw i think we should have a 'store all' option
     keyboard = [
         [
-            InlineKeyboardButton("Gender", callback_data="gender"),
-            InlineKeyboardButton("Course", callback_data="course"),
+            InlineKeyboardButton("Gender", callback_data="gender")
+        ],
+        [
+            InlineKeyboardButton("Course", callback_data="course")
+        ],
+        [
             InlineKeyboardButton("Year", callback_data="year")
         ],
         [
-            InlineKeyboardButton("Location", callback_data="location"),
+            InlineKeyboardButton("Location", callback_data="location")
+
+        ],
+        [
             InlineKeyboardButton("Pax", callback_data="pax")
         ],
         [
