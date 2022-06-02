@@ -136,6 +136,7 @@ def initiate_or_join(update, context):
         update.callback_query.message.reply_text(
             "Greetings! Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
     else:
+        print("SOMETHING WENT WRONG HERE")
         update.callback_query.message.reply_text(
             "Greetings! Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
 
@@ -307,6 +308,7 @@ def store_data(update, context):
         update.callback_query.message.reply_text(
             "Would you like your data to be stored?", reply_markup=reply_markup)
     else:
+        print("SOMETHING WENT WRONG HERE")
         update.callback_query.message.reply_text(
             "Would you like your data to be stored?", reply_markup=reply_markup)
 
