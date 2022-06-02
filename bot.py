@@ -7,8 +7,9 @@ from datetime import datetime, timedelta
 
 API_KEY = "5371570532:AAEWry3st7_CFoQo7hJwwehMJvkD0NR-P9Q"
 
-EXPECT_CODE, EXPECT_COURSE, EXPECT_YEAR, EXPECT_LOCATION, EXPECT_REMARK = range(
-    5)
+verification_code = "123"
+
+EXPECT_TEXT = range(1)
 
 
 def start(update: Update, context: CallbackContext):
@@ -86,7 +87,7 @@ def verification(update, context):
     update.message.reply_text(
         "A verification code has been sent to " + str(email) + " please check and enter the code here to complete the verification.")
 
-    return EXPECT_CODE
+    return
 
 
 def code(update, context):
@@ -100,7 +101,7 @@ def code(update, context):
         update.message.reply_text(
             "Thank you! Your email has been verified. Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
 
-        return EXPECT_COURSE
+        return
     else:
         keyboard = [[
             InlineKeyboardButton("Resend", callback_data="resend")]]
@@ -247,7 +248,7 @@ def remark_yes(update, context):
     return EXPECT_REMARK
 
 
-def data(update, context):
+def store_data(update, context):
     keyboard = [[
         InlineKeyboardButton("Yes", callback_data="store_data_yes"),
         InlineKeyboardButton("No", callback_data="store_data_no")]]
@@ -286,6 +287,10 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     query.answer()
 
     print(query.data)
+
+    state = query.data
+    print("state: ")
+    print(state)
 
     # first_time
     if query.data == "first_time_yes":
@@ -329,13 +334,35 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     elif query.data == "remark_no_first":
         update.callback_query.message.reply_text("idk what to do")
     elif query.data == "remark_no":
-        data(update, context)
+        store_data(update, context)
 
     # store data
     elif query.data == "store_data_yes":
         which_data(update, context)
     elif query.data == "store_data_no":
         end(update, context)
+
+    return
+
+
+def handle_text(update, context):
+    text = update.effective_message.text
+
+    print(text)
+
+    # email
+    if text.endswith("u.nus.edu"):
+        ConversationHandler.END
+        verification(update, context)
+
+    # verification
+    elif text == verification_code:
+        ConversationHandler.END
+        code(update, context)
+
+    # unknown text
+    else:
+        unknown_text(update, context)
 
     return
 
@@ -364,17 +391,11 @@ def main():
     dp.add_handler(CallbackQueryHandler(handle_callback_query))
 
     conv_handler = ConversationHandler(
-        entry_points=[MessageHandler(
-            Filters.regex("@u.nus.edu"), verification)],
+        entry_points=[MessageHandler(Filters.text, handle_text)],
         states={
-            EXPECT_CODE: [MessageHandler(Filters.text, code)],
-            EXPECT_COURSE: [MessageHandler(Filters.text, year)],
-            EXPECT_YEAR: [MessageHandler(Filters.text, location)],
-            EXPECT_LOCATION: [MessageHandler(Filters.text, people)],
-            EXPECT_REMARK: [MessageHandler(Filters.text, data)]
+            EXPECT_TEXT: [MessageHandler(Filters.text, handle_text)]
         },
-        fallbacks=[CommandHandler('cancel', cancel)],
-        allow_reentry=True
+        fallbacks=[CommandHandler('cancel', cancel)]
     )
 
     dp.add_handler(conv_handler)
