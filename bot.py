@@ -160,10 +160,10 @@ def date(update, context):
 
 def time(update, context):
     keyboard = [[
-        InlineKeyboardButton("Morning <1200", callback_data="morning"),
-        InlineKeyboardButton("Afternoon 1200<=x<=1800",
-                             callback_data="afternoon"),
-        InlineKeyboardButton("Evening >1800", callback_data="evening")
+        InlineKeyboardButton("Morning <1200", callback_data="morning")],
+        [InlineKeyboardButton("Afternoon 1200<=x<=1800",
+                             callback_data="afternoon")],
+        [InlineKeyboardButton("Evening >1800", callback_data="evening")
     ]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -265,10 +265,10 @@ def main():
 
     dp.add_handler(conv_handler)
 
-# Filters out unknown commands
-##    dp.add_handler(MessageHandler(Filters.command, unknown))
-# Filters out unknown messages.
-##    dp.add_handler(MessageHandler(Filters.text, unknown_text))
+#Filters out unknown commands
+    dp.add_handler(MessageHandler(Filters.command, unknown))
+#Filters out unknown messages.
+    dp.add_handler(MessageHandler(Filters.text, unknown_text))
 
     # Start the Bot
     updater.start_polling()
