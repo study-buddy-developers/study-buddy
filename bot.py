@@ -153,6 +153,7 @@ def date(update):
 
     update.callback_query.message.reply_text(
         "Please select your desired date for your study session", reply_markup=reply_markup)
+    
     return
 
 
@@ -180,12 +181,17 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
     query.answer()
 
-    db.users.insert_one({"userid":update.callback_query.message.from_user.id})
-
     # first_time
     if query.data == "first_time_yes":
+        cursor = db.users.find({"userid":update.callback_query.message.from_user.id})
+        if list(cursor) != []:
+            db.users.insert_one({"userid":update.callback_query.message.from_user.id})
         permission(update)
+
     elif query.data == "first_time_no":
+        cursor = db.users.find({"userid":update.callback_query.message.from_user.id})
+        if list(cursor) != []:
+            db.users.insert_one({"userid":update.callback_query.message.from_user.id})
         initiate_or_join(update)
 
     # permission
@@ -195,16 +201,25 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # initiate_or_join
     elif query.data == "initiate":
+        db.StudySessions.insert_one({"userid":update.callback_query.message.from_user.id}) # where userid is the user ID of the initiator 
         gender(update)
     elif query.data == "join":
         update.callback_query.message.reply_text("handle join")
 
     # gender
     elif query.data == "male" or query.data == "female":
+        filter_con = { "userid" : update.callback_query.message.from_user.id } 
+        new_con = { "$set" : { 'gender': query.data } }
+        db.users.update_one(filter_con, new_con)
         date(update)
 
     # date
     elif query.data == "1" or query.data == "2" or query.data == "3" or query.data == "4" or query.data == "5" or query.data == "6" or query.data == "7":
+        curr_date = datetime.now() + timedelta(days=query.data)
+        curr_day = str(curr_date.day)
+        curr_month = str(curr_date.month)
+        curr_year = str(curr_date.year)
+
         time(update)
 
     # time
