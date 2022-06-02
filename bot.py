@@ -7,8 +7,6 @@ from datetime import datetime, timedelta
 
 API_KEY = "5371570532:AAEWry3st7_CFoQo7hJwwehMJvkD0NR-P9Q"
 
-verification_code = "123"
-
 EXPECT_TEXT = range(1)
 
 
@@ -85,17 +83,23 @@ def email(update, context):
 def verification(update, context):
     email = update.message.text
     update.message.reply_text(
-        "A verification code has been sent to " + str(email) + " please check and enter the code here to complete the verification.")
+        "A verification code has been sent to " + str(email) + " Please check and enter the code here to complete the verification.")
 
     return
 
 
 def code(update, context):
     code = update.effective_message.text
-    if code == '123':
+
+    # TODO: get verification code here
+    verification_code = "123"
+
+    if code == verification_code:
+        # TODO: initiate_or_join
         keyboard = [[
             InlineKeyboardButton("Initiate", callback_data="initiate"),
-            InlineKeyboardButton("Join", callback_data="join")]]
+            InlineKeyboardButton("Join", callback_data="join")
+        ]]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         update.message.reply_text(
@@ -104,7 +108,8 @@ def code(update, context):
         return
     else:
         keyboard = [[
-            InlineKeyboardButton("Resend", callback_data="resend")]]
+            InlineKeyboardButton("Resend", callback_data="resend")
+        ]]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         update.message.reply_text(
@@ -116,7 +121,7 @@ def code(update, context):
 def new_code(update, context):
     update.callback_query.message.reply_text(
         "A new code has been sent to your email. Please check and enter the code here to complete the verification.")
-    return EXPECT_CODE
+    return
 
 
 def initiate_or_join(update, context):
@@ -160,7 +165,7 @@ def date(update, context):
         curr_year = str(curr_date.year)
 
         keyboard[row].append(InlineKeyboardButton(
-            curr_day + "/" + curr_month + "/" + curr_year, callback_data=str(i)))
+            curr_day + "/" + curr_month + "/" + curr_year, callback_data="date_"+str(i + 1)))
 
         col += 1
         col %= 3
@@ -173,12 +178,10 @@ def date(update, context):
 
 
 def time(update, context):
-    keyboard = [[
-        InlineKeyboardButton("Morning <1200", callback_data="morning")],
-        [InlineKeyboardButton("Afternoon 1200<=x<=1800",
-                              callback_data="afternoon")],
-        [InlineKeyboardButton("Evening >1800", callback_data="evening")
-         ]]
+    keyboard = [[InlineKeyboardButton("Morning <1200", callback_data="morning")],
+                [InlineKeyboardButton("Afternoon 1200<=x<=1800",
+                                      callback_data="afternoon")],
+                [InlineKeyboardButton("Evening >1800", callback_data="evening")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.callback_query.message.reply_text(
@@ -187,39 +190,45 @@ def time(update, context):
 
 
 def course(update, context):
-    update.callback_query.message.reply_text(
-        "What is your course?")
+    update.callback_query.message.reply_text("What is your course?")
+
     return
 
 
 def year(update, context):
-    course = update.effective_message.text
+    keyboard = [
+        [
+            InlineKeyboardButton("Year One", callback_data="year_one"),
+            InlineKeyboardButton("Year Two", callback_data="year_two")
+        ],
+        [
+            InlineKeyboardButton("Year Three", callback_data="year_three"),
+            InlineKeyboardButton("Year Four", callback_data="year_four")
+        ],
+        [
+            InlineKeyboardButton("Year Five", callback_data="year_five")
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
 
-    print(course)
+    update.message.reply_text(
+        "What year are you in?", reply_markup=reply_markup)
 
-    update.message.reply_text("What year are you in?")
-    return EXPECT_YEAR
+    return
 
 
 def location(update, context):
-    year = update.effective_message.text
+    update.callback_query.message.reply_text("Where would you like to study?")
 
-    print(year)
-
-    update.message.reply_text("Where would you like to study?")
-    return EXPECT_LOCATION
+    return
 
 
-def people(update, context):
-    location = update.effective_message.text
-
-    print(location)
-
+def pax(update, context):
     keyboard = [[
-        InlineKeyboardButton("2", callback_data="two")],
-        [InlineKeyboardButton("3", callback_data="three")],
-        [InlineKeyboardButton("4", callback_data="four")],
-        [InlineKeyboardButton("5", callback_data="five")
+        InlineKeyboardButton("2", callback_data="pax_two")],
+        [InlineKeyboardButton("3", callback_data="pax_three")],
+        [InlineKeyboardButton("4", callback_data="pax_four")],
+        [InlineKeyboardButton("5", callback_data="pax_five")
          ]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -229,12 +238,14 @@ def people(update, context):
 
 
 def remark(update, context):
-    keyboard = [[
-        InlineKeyboardButton("Yes", callback_data="remark_yes")],
-        [InlineKeyboardButton("No (1st time user)",
-                              callback_data="remark_no_first")],
-        [InlineKeyboardButton("No", callback_data="remark_no")
-         ]]
+    keyboard = [
+        [
+            InlineKeyboardButton("Yes", callback_data="remark_yes")
+        ],
+        [
+            InlineKeyboardButton("No", callback_data="remark_no")
+        ]
+    ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.callback_query.message.reply_text(
@@ -245,7 +256,8 @@ def remark(update, context):
 def remark_yes(update, context):
     update.callback_query.message.reply_text(
         "What remark would you like to add?")
-    return EXPECT_REMARK
+
+    return
 
 
 def store_data(update, context):
@@ -254,20 +266,34 @@ def store_data(update, context):
         InlineKeyboardButton("No", callback_data="store_data_no")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.callback_query.message.reply_text(
-        "Would you like your data to be stored?", reply_markup=reply_markup)
+    if context.chat_data["state"] == "remark_done":
+        update.message.reply_text(
+            "Would you like your data to be stored?", reply_markup=reply_markup)
+    elif context.chat_data["state"] == "remark_no":
+        update.callback_query.message.reply_text(
+            "Would you like your data to be stored?", reply_markup=reply_markup)
+    else:
+        update.callback_query.message.reply_text(
+            "Would you like your data to be stored?", reply_markup=reply_markup)
+
     return
 
 
 def which_data(update, context):  # btw i think we should have a 'store all' option
-    keyboard = [[
-        InlineKeyboardButton("Gender", callback_data="gender"),
-        InlineKeyboardButton("Course", callback_data="course"),
-        InlineKeyboardButton("Year", callback_data="year")],
-        [InlineKeyboardButton("Location", callback_data="location"),
-         InlineKeyboardButton("Pax", callback_data="pax"),
-         InlineKeyboardButton("Done", callback_data="done")
-         ]]
+    keyboard = [
+        [
+            InlineKeyboardButton("Gender", callback_data="gender"),
+            InlineKeyboardButton("Course", callback_data="course"),
+            InlineKeyboardButton("Year", callback_data="year")
+        ],
+        [
+            InlineKeyboardButton("Location", callback_data="location"),
+            InlineKeyboardButton("Pax", callback_data="pax")
+        ],
+        [
+            InlineKeyboardButton("Done", callback_data="done")
+        ]
+    ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.callback_query.message.reply_text(
@@ -279,7 +305,7 @@ def end(update, context):
     update.callback_query.message.reply_text(
         "Your study session has been posted successfully! We will update you when someone joined your session")
 
-    return
+    return ConversationHandler.END
 
 
 def handle_callback_query(update: Update, context: CallbackContext) -> None:
@@ -288,9 +314,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     print(query.data)
 
-    state = query.data
-    print("state: ")
-    print(state)
+    context.chat_data["state"] = query.data
 
     # first_time
     if query.data == "first_time_yes":
@@ -317,22 +341,24 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         date(update, context)
 
     # date
-    elif query.data == "1" or query.data == "2" or query.data == "3" or query.data == "4" or query.data == "5" or query.data == "6" or query.data == "7":
+    elif query.data == "date_1" or query.data == "date_2" or query.data == "date_3" or query.data == "date_4" or query.data == "date_5" or query.data == "date_6" or query.data == "date_7":
         time(update, context)
 
     # time
     elif query.data == "morning" or query.data == "afternoon" or query.data == "evening":
         course(update, context)
 
-    # number of people
-    elif query.data == "two" or query.data == "three" or query.data == "four" or query.data == "five":
+    # year
+    elif query.data == "year_one" or query.data == "year_two" or query.data == "year_three" or query.data == "year_four" or query.data == "year_five":
+        location(update, context)
+
+    # pax
+    elif query.data == "pax_two" or query.data == "pax_three" or query.data == "pax_four" or query.data == "pax_five":
         remark(update, context)
 
-    # remark
+    # remark_yes or remark_no
     elif query.data == "remark_yes":
         remark_yes(update, context)
-    elif query.data == "remark_no_first":
-        update.callback_query.message.reply_text("idk what to do")
     elif query.data == "remark_no":
         store_data(update, context)
 
@@ -340,6 +366,13 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     elif query.data == "store_data_yes":
         which_data(update, context)
     elif query.data == "store_data_no":
+        end(update, context)
+
+    # which data
+    elif query.data == "gender" or query.data == "course" or query.data == "location" or query.data == "pax":
+        # TODO: store data
+        print("handle store data")
+    elif query.data == "done":
         end(update, context)
 
     return
@@ -350,18 +383,51 @@ def handle_text(update, context):
 
     print(text)
 
+    if "state" in context.chat_data.keys():
+        print("state: " + context.chat_data["state"])
+        state = context.chat_data["state"]
+    else:
+        state = ""
+
     # email
-    if text.endswith("u.nus.edu"):
-        ConversationHandler.END
+    if state == "permission_allow" and text.endswith("@u.nus.edu"):
+        context.chat_data["state"] = "verification"
         verification(update, context)
 
     # verification
-    elif text == verification_code:
-        ConversationHandler.END
+    # TODO: isNumeric()
+    elif state == "verification" or state == "resend":
+        context.chat_data["state"] = "code"
         code(update, context)
+
+    # redo verification
+    elif state == "code" and text.endswith("@u.nus.edu"):
+        context.chat_data["state"] = "verification"
+        verification(update, context)
+
+    # course
+    elif state == "morning" or state == "afternoon" or state == "evening":
+        context.chat_data["state"] = "course"
+        year(update, context)
+
+    # year
+    elif state == "course":
+        context.chat_data["state"] = "year"
+        year(update, context)
+
+    # pax
+    elif state == "year_one" or state == "year_two" or state == "year_three" or state == "year_four" or state == "year_five":
+        context.chat_data["state"] = "pax"
+        pax(update, context)
+
+    # remarks
+    elif state == "remark_yes":
+        context.chat_data["state"] = "remark_done"
+        store_data(update, context)
 
     # unknown text
     else:
+        context.chat_data["state"] = ""
         unknown_text(update, context)
 
     return
