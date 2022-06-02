@@ -54,6 +54,7 @@ def first_time(update, context):
 
     update.message.reply_text(
         "Hi! Welcome to Study Buddy Telegram Bot! Is this your first time using this bot?", reply_markup=reply_markup)
+
     return
 
 
@@ -67,12 +68,14 @@ def permission(update, context):
 
     update.callback_query.message.reply_text(
         "Welcome to StudyBuddy Telegram Bot! Before we begin, we would like to ask for your permission to record your telegram handle. All information will be kept confidential in this telegram bot.", reply_markup=reply_markup)
+
     return
 
 
 def email(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text="Hi! Welcome to StudyBuddy Bot! To verify your identity, what is your NUS email? (ending with @u.nus.edu)")
+
     return
 
 
@@ -103,7 +106,6 @@ def code(update, context):
         update.message.reply_text(
             "Thank you! Your email has been verified. Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
 
-        return
     else:
         keyboard = [
             [
@@ -115,12 +117,14 @@ def code(update, context):
         update.message.reply_text(
             "Sorry, the verification code you have entered is incorrect, please click the resend button for a new code."
             " If you have entered your email incorrectly, please send your email (ending with @u.nus.edu) again.", reply_markup=reply_markup)
-        return
+
+    return
 
 
 def new_code(update, context):
     update.callback_query.message.reply_text(
         "A new code has been sent to your email. Please check and enter the code here to complete the verification.")
+
     return
 
 
@@ -135,6 +139,7 @@ def initiate_or_join(update, context):
 
     update.callback_query.message.reply_text(
         "Greetings! Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
+
     return
 
 
@@ -151,6 +156,7 @@ def gender(update, context):
 
     update.callback_query.message.reply_text(
         "What is your gender? (Note that you will not have a say in the gender of your study buddies if you choose ‘prefer not to say’)", reply_markup=reply_markup)
+
     return
 
 
@@ -180,6 +186,7 @@ def date(update, context):
 
     update.callback_query.message.reply_text(
         "Please select your desired date for your study session", reply_markup=reply_markup)
+
     return
 
 
@@ -200,6 +207,7 @@ def time(update, context):
 
     update.callback_query.message.reply_text(
         "What time would you like to have your study session", reply_markup=reply_markup)
+
     return
 
 
@@ -256,6 +264,7 @@ def pax(update, context):
 
     update.message.reply_text(
         "How many people would you like in your study session?", reply_markup=reply_markup)
+
     return
 
 
@@ -272,6 +281,7 @@ def remark(update, context):
 
     update.callback_query.message.reply_text(
         "Any additional remarks?", reply_markup=reply_markup)
+
     return
 
 
@@ -330,6 +340,7 @@ def which_data(update, context):  # btw i think we should have a 'store all' opt
 
     update.callback_query.message.reply_text(
         "Which data would you like to store?", reply_markup=reply_markup)
+
     return
 
 
@@ -468,6 +479,7 @@ def handle_text(update, context):
 def cancel(update: Update, context: CallbackContext):
     update.message.reply_text(
         "Conversation cancelled by user. Send /begin to start again.")
+
     return ConversationHandler.END
 
 
@@ -509,6 +521,8 @@ def main():
     # time, since,start_polling() is non-blocking and will stop
     # the bot
     updater.idle()
+
+    return 0
 
 
 if __name__ == '__main__':
