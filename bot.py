@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 API_KEY = "5371570532:AAEWry3st7_CFoQo7hJwwehMJvkD0NR-P9Q"
 
-EXPECT_CODE, EXPECT_COURSE, EXPECT_YEAR, EXPECT_LOCATION = range(4)
+EXPECT_CODE, EXPECT_COURSE, EXPECT_YEAR, EXPECT_LOCATION, EXPECT_REMARK = range(5)
 
 
 def start(update: Update, context: CallbackContext):
@@ -39,13 +39,6 @@ def unknown(update: Update, context: CallbackContext):
 def unknown_text(update: Update, context: CallbackContext):
     update.message.reply_text(
         "Sorry I can't recognize you , you said '%s'" % update.message.text)
-
-
-def test(update, context):
-    update.message.reply_text("this is a test")
-
-    # dp.remove_handler(MessageHandler(
-    #     Filters.regex("@u.nus.edu"), test))
 
 
 def echo(update, context):
@@ -94,15 +87,31 @@ def verification(update, context):
     return EXPECT_CODE
 
 def code(update,context):
-    keyboard = [[
-        InlineKeyboardButton("Initiate", callback_data="initiate"),
-        InlineKeyboardButton("Join", callback_data="join")]]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    code = update.effective_message.text
+    if code == '123':
+        keyboard = [[
+            InlineKeyboardButton("Initiate", callback_data="initiate"),
+            InlineKeyboardButton("Join", callback_data="join")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
     
-    update.message.reply_text(
-        "Thank you! Your email has been verified. Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
+        update.message.reply_text(
+            "Thank you! Your email has been verified. Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
     
-    return EXPECT_COURSE
+        return EXPECT_COURSE
+    else:
+        keyboard = [[
+            InlineKeyboardButton("Resend", callback_data="resend")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        update.message.reply_text(
+            "Sorry, the verification code you have entered is incorrect, please click the resend button for a new code."
+            " If you have entered your email incorrectly, please send your email (ending with @u.nus.edu) again.", reply_markup=reply_markup)
+        return
+
+def new_code(update, context):
+    update.callback_query.message.reply_text(
+        "A new code has been sent to your email. Please check and enter the code here to complete the verification.")
+    return EXPECT_CODE
 
 
 def initiate_or_join(update, context):
@@ -186,11 +195,64 @@ def location(update,context):
     update.message.reply_text("Where would you like to study?")
     return EXPECT_LOCATION
 
-def random(update,context):
-    place = update.effective_message.text
-    update.message.reply_text(place + ", I see. Good choice!")
-    return ConversationHandler.END
+def people(update,context):
+    keyboard = [[
+        InlineKeyboardButton("2", callback_data="two")],
+        [InlineKeyboardButton("3", callback_data="three")],
+        [InlineKeyboardButton("4", callback_data="four")],
+        [InlineKeyboardButton("5", callback_data="five")
+    ]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
 
+    update.message.reply_text(
+        "How many people would you like in your study session?", reply_markup=reply_markup)
+    return
+
+def remark(update,context):
+    keyboard = [[
+        InlineKeyboardButton("Yes", callback_data="remark_yes")],
+        [InlineKeyboardButton("No (1st time user)", callback_data="remark_no_first")],
+        [InlineKeyboardButton("No", callback_data="remark_no")
+    ]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.callback_query.message.reply_text(
+        "Any additional remarks?", reply_markup=reply_markup)
+    return
+
+def remark_yes(update,context):
+    update.callback_query.message.reply_text(
+        "What remark would you like to add?")
+    return EXPECT_REMARK
+
+def data(update,context):
+    keyboard = [[
+        InlineKeyboardButton("Yes", callback_data="store_data_yes"),
+        InlineKeyboardButton("No", callback_data="store_data_no")]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.callback_query.message.reply_text(
+        "Would you like your data to be stored?", reply_markup=reply_markup)
+    return 
+
+def which_data(update,context): ##btw i think we should have a 'store all' option
+    keyboard = [[
+        InlineKeyboardButton("Gender", callback_data="gender"),
+        InlineKeyboardButton("Course", callback_data="course"),
+        InlineKeyboardButton("Year", callback_data="year")],
+        [InlineKeyboardButton("Location", callback_data="location"),
+        InlineKeyboardButton("Pax", callback_data="pax"),
+        InlineKeyboardButton("Done", callback_data="done")
+    ]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.callback_query.message.reply_text(
+        "Which data would you like to store?", reply_markup=reply_markup)
+    return
+
+def end(update,context):
+    update.callback_query.message.reply_text(
+        "Your study session has been posted successfully! We will update you when someone joined your session")
 
 def handle_callback_query(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
@@ -205,6 +267,10 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     # permission
     elif query.data == "permission_allow":
         email(update, context)
+        
+    # resend verification code
+    elif query.data == "resend":
+        new_code(update,context)
 
     # initiate_or_join
     elif query.data == "initiate":
@@ -224,12 +290,30 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     elif query.data == "morning" or query.data == "afternoon" or query.data == "evening":
         course(update, context)
 
+    # number of people
+    elif query.data == "two" or query.data == "three" or query.data == "four" or query.data == "five":
+        remark(update, context)
+
+    # remark
+    elif query.data == "remark_yes":
+        remark_yes(update, context)
+    elif query.data == "remark_no_first":
+        update.callback_query.message.reply_text("idk what to do")
+    elif query.data == "remark_no":
+        data(update, context)
+
+    # store data
+    elif query.data == "store_data_yes":
+        which_data(update, context)
+    elif query.data == "store_data_no":
+        end(update, context)
+
     return
 
 
 def cancel(update: Update, context: CallbackContext):
     update.message.reply_text(
-        "Name Conversation cancelled by user. Bye. Send /begin to start again")
+        "Conversation cancelled by user. Bye. Send /begin to start again")
     return ConversationHandler.END
 
 
@@ -246,6 +330,7 @@ def main():
     dp.add_handler(CommandHandler('echo', echo))
     dp.add_handler(CommandHandler('id', user_id))
     dp.add_handler(CommandHandler('begin', begin))
+    dp.add_handler(CommandHandler('cancel',cancel))
 
     dp.add_handler(CallbackQueryHandler(handle_callback_query))
 
@@ -257,7 +342,8 @@ def main():
             EXPECT_CODE: [MessageHandler(Filters.text, code)],
             EXPECT_COURSE: [MessageHandler(Filters.text, year)],
             EXPECT_YEAR: [MessageHandler(Filters.text, location)],
-            EXPECT_LOCATION: [MessageHandler(Filters.text, random)]
+            EXPECT_LOCATION: [MessageHandler(Filters.text, people)],
+            EXPECT_REMARK: [MessageHandler(Filters.text, data)]
         },
         fallbacks=[CommandHandler('cancel', cancel)],
         allow_reentry=True
