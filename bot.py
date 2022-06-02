@@ -5,6 +5,8 @@ from telegram.update import Update
 from telegram.ext import CallbackContext, CommandHandler, MessageHandler
 from telegram.ext import CallbackQueryHandler, Filters, ContextTypes
 from datetime import datetime, timedelta
+from credentials import *
+import pymongo
 
 API_KEY = "5371570532:AAEWry3st7_CFoQo7hJwwehMJvkD0NR-P9Q"
 
@@ -45,6 +47,10 @@ def test(update, context):
 
     # dp.remove_handler(MessageHandler(
     #     Filters.regex("@u.nus.edu"), test))
+
+def transfer_message_to_db(update,info_type):
+    info = str(update.message.text)
+    db.users.insert_one({info_type:info})
 
 
 def echo(update, context):
@@ -174,6 +180,8 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
     query.answer()
 
+    db.users.insert_one({"userid":update.callback_query.message.from_user.id})
+
     # first_time
     if query.data == "first_time_yes":
         permission(update)
@@ -183,6 +191,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     # permission
     elif query.data == "permission_allow":
         email(update)
+
 
     # initiate_or_join
     elif query.data == "initiate":
