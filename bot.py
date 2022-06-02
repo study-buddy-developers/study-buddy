@@ -438,28 +438,23 @@ def handle_text(update, context):
         context.chat_data["state"] = "verification"
         verification(update, context)
 
-    # verification
-    # TODO: isNumeric()
-    elif state == "verification" or state == "resend":
+    # verification code
+    elif (state == "verification" or state == "resend") and text.isnumeric():
         context.chat_data["state"] = "code"
         code(update, context)
 
-    # redo verification
+    # redo email
     elif state == "code" and text.endswith("@u.nus.edu"):
         context.chat_data["state"] = "verification"
         verification(update, context)
 
+    # TODO: some bug here
     # course
-    elif state == "morning" or state == "afternoon" or state == "evening":
-        context.chat_data["state"] = "course"
-        year(update, context)
-
-    # year
-    elif state == "course":
+    elif state == "morning" or state == "afternoon" or state == "evening" and text.isnumeric():
         context.chat_data["state"] = "year"
         year(update, context)
 
-    # pax
+    # location
     elif state == "year_one" or state == "year_two" or state == "year_three" or state == "year_four" or state == "year_five":
         context.chat_data["state"] = "pax"
         pax(update, context)
