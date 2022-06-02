@@ -314,7 +314,7 @@ def store_data(update, context):
     return
 
 
-def which_data(update, context):  # btw i think we should have a 'store all' option
+def which_data(update, context):
     keyboard = [
         [
             InlineKeyboardButton("Gender", callback_data="gender")
@@ -490,11 +490,11 @@ def main():
     dp = updater.dispatcher
 
     # adding start command handler to dispatcher.
-    dp.add_handler(CommandHandler('start', start))
-    dp.add_handler(CommandHandler('help', help))
-    dp.add_handler(CommandHandler('id', user_id))
-    dp.add_handler(CommandHandler('begin', begin))
-    dp.add_handler(CommandHandler('cancel', cancel))
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("id", user_id))
+    dp.add_handler(CommandHandler("begin", begin))
+    dp.add_handler(CommandHandler("cancel", cancel))
 
     dp.add_handler(CallbackQueryHandler(handle_callback_query))
 
@@ -503,7 +503,7 @@ def main():
         states={
             EXPECT_TEXT: [MessageHandler(Filters.text, handle_text)]
         },
-        fallbacks=[CommandHandler('cancel', cancel)]
+        fallbacks=[CommandHandler("cancel", cancel)]
     )
 
     dp.add_handler(conv_handler)

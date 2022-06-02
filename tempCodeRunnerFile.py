@@ -1,1 +1,1 @@
-elif state == "morning" or state == "afternoon" or state == "evening":
+'
