@@ -7,7 +7,8 @@ from datetime import datetime, timedelta
 
 API_KEY = "5371570532:AAEWry3st7_CFoQo7hJwwehMJvkD0NR-P9Q"
 
-EXPECT_CODE, EXPECT_COURSE, EXPECT_YEAR, EXPECT_LOCATION, EXPECT_REMARK = range(5)
+EXPECT_CODE, EXPECT_COURSE, EXPECT_YEAR, EXPECT_LOCATION, EXPECT_REMARK = range(
+    5)
 
 
 def start(update: Update, context: CallbackContext):
@@ -31,14 +32,14 @@ def youtube_url(update: Update, context: CallbackContext):
     update.message.reply_text("Youtube Link =>https://www.youtube.com/")
 
 
-def unknown(update: Update, context: CallbackContext):
+def unknown_command(update: Update, context: CallbackContext):
     update.message.reply_text(
         "Sorry '%s' is not a valid command" % update.message.text)
 
 
 def unknown_text(update: Update, context: CallbackContext):
     update.message.reply_text(
-        "Sorry I can't recognize you , you said '%s'" % update.message.text)
+        "Sorry I can't recognize you , you said '%s'. Please use /begin to start again." % update.message.text)
 
 
 def echo(update, context):
@@ -76,8 +77,9 @@ def permission(update, context):
 
 def email(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id,
-                             text="Hi! Welcome to StudyBuddy Bot! To verify your identity, What is your NUS email? (ending with @u.nus.edu)")
+                             text="Hi! Welcome to StudyBuddy Bot! To verify your identity, what is your NUS email? (ending with @u.nus.edu)")
     return
+
 
 def verification(update, context):
     email = update.message.text
@@ -86,27 +88,29 @@ def verification(update, context):
 
     return EXPECT_CODE
 
-def code(update,context):
+
+def code(update, context):
     code = update.effective_message.text
     if code == '123':
         keyboard = [[
             InlineKeyboardButton("Initiate", callback_data="initiate"),
             InlineKeyboardButton("Join", callback_data="join")]]
         reply_markup = InlineKeyboardMarkup(keyboard)
-    
+
         update.message.reply_text(
             "Thank you! Your email has been verified. Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
-    
+
         return EXPECT_COURSE
     else:
         keyboard = [[
             InlineKeyboardButton("Resend", callback_data="resend")]]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        
+
         update.message.reply_text(
             "Sorry, the verification code you have entered is incorrect, please click the resend button for a new code."
             " If you have entered your email incorrectly, please send your email (ending with @u.nus.edu) again.", reply_markup=reply_markup)
         return
+
 
 def new_code(update, context):
     update.callback_query.message.reply_text(
@@ -171,9 +175,9 @@ def time(update, context):
     keyboard = [[
         InlineKeyboardButton("Morning <1200", callback_data="morning")],
         [InlineKeyboardButton("Afternoon 1200<=x<=1800",
-                             callback_data="afternoon")],
+                              callback_data="afternoon")],
         [InlineKeyboardButton("Evening >1800", callback_data="evening")
-    ]]
+         ]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.callback_query.message.reply_text(
@@ -186,46 +190,64 @@ def course(update, context):
         "What is your course?")
     return
 
+
 def year(update, context):
     course = update.effective_message.text
-    update.message.reply_text("Ah, " + course + "! What year are you in?")
+
+    print(course)
+
+    update.message.reply_text("What year are you in?")
     return EXPECT_YEAR
 
-def location(update,context):
+
+def location(update, context):
+    year = update.effective_message.text
+
+    print(year)
+
     update.message.reply_text("Where would you like to study?")
     return EXPECT_LOCATION
 
-def people(update,context):
+
+def people(update, context):
+    location = update.effective_message.text
+
+    print(location)
+
     keyboard = [[
         InlineKeyboardButton("2", callback_data="two")],
         [InlineKeyboardButton("3", callback_data="three")],
         [InlineKeyboardButton("4", callback_data="four")],
         [InlineKeyboardButton("5", callback_data="five")
-    ]]
+         ]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.message.reply_text(
         "How many people would you like in your study session?", reply_markup=reply_markup)
     return
 
-def remark(update,context):
+
+def remark(update, context):
     keyboard = [[
         InlineKeyboardButton("Yes", callback_data="remark_yes")],
-        [InlineKeyboardButton("No (1st time user)", callback_data="remark_no_first")],
+        [InlineKeyboardButton("No (1st time user)",
+                              callback_data="remark_no_first")],
         [InlineKeyboardButton("No", callback_data="remark_no")
-    ]]
+         ]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.callback_query.message.reply_text(
         "Any additional remarks?", reply_markup=reply_markup)
     return
 
-def remark_yes(update,context):
+
+def remark_yes(update, context):
     update.callback_query.message.reply_text(
         "What remark would you like to add?")
     return EXPECT_REMARK
 
-def data(update,context):
+
+def data(update, context):
     keyboard = [[
         InlineKeyboardButton("Yes", callback_data="store_data_yes"),
         InlineKeyboardButton("No", callback_data="store_data_no")]]
@@ -233,30 +255,37 @@ def data(update,context):
 
     update.callback_query.message.reply_text(
         "Would you like your data to be stored?", reply_markup=reply_markup)
-    return 
+    return
 
-def which_data(update,context): ##btw i think we should have a 'store all' option
+
+def which_data(update, context):  # btw i think we should have a 'store all' option
     keyboard = [[
         InlineKeyboardButton("Gender", callback_data="gender"),
         InlineKeyboardButton("Course", callback_data="course"),
         InlineKeyboardButton("Year", callback_data="year")],
         [InlineKeyboardButton("Location", callback_data="location"),
-        InlineKeyboardButton("Pax", callback_data="pax"),
-        InlineKeyboardButton("Done", callback_data="done")
-    ]]
+         InlineKeyboardButton("Pax", callback_data="pax"),
+         InlineKeyboardButton("Done", callback_data="done")
+         ]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.callback_query.message.reply_text(
         "Which data would you like to store?", reply_markup=reply_markup)
     return
 
-def end(update,context):
+
+def end(update, context):
     update.callback_query.message.reply_text(
         "Your study session has been posted successfully! We will update you when someone joined your session")
+
+    return
+
 
 def handle_callback_query(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
     query.answer()
+
+    print(query.data)
 
     # first_time
     if query.data == "first_time_yes":
@@ -267,10 +296,10 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     # permission
     elif query.data == "permission_allow":
         email(update, context)
-        
+
     # resend verification code
     elif query.data == "resend":
-        new_code(update,context)
+        new_code(update, context)
 
     # initiate_or_join
     elif query.data == "initiate":
@@ -330,14 +359,13 @@ def main():
     dp.add_handler(CommandHandler('echo', echo))
     dp.add_handler(CommandHandler('id', user_id))
     dp.add_handler(CommandHandler('begin', begin))
-    dp.add_handler(CommandHandler('cancel',cancel))
+    dp.add_handler(CommandHandler('cancel', cancel))
 
     dp.add_handler(CallbackQueryHandler(handle_callback_query))
 
     conv_handler = ConversationHandler(
-        # TODO: find handler for entry_points
         entry_points=[MessageHandler(
-                Filters.regex("@u.nus.edu"), verification)],
+            Filters.regex("@u.nus.edu"), verification)],
         states={
             EXPECT_CODE: [MessageHandler(Filters.text, code)],
             EXPECT_COURSE: [MessageHandler(Filters.text, year)],
@@ -351,9 +379,9 @@ def main():
 
     dp.add_handler(conv_handler)
 
-#Filters out unknown commands
-    dp.add_handler(MessageHandler(Filters.command, unknown))
-#Filters out unknown messages.
+    # Filters out unknown commands
+    dp.add_handler(MessageHandler(Filters.command, unknown_command))
+    # Filters out unknown messages.
     dp.add_handler(MessageHandler(Filters.text, unknown_text))
 
     # Start the Bot
