@@ -94,17 +94,9 @@ def code(update, context):
     verification_code = "123"
 
     if code == verification_code:
-        # TODO: initiate_or_join
-        keyboard = [
-            [
-                InlineKeyboardButton("Initiate", callback_data="initiate"),
-                InlineKeyboardButton("Join", callback_data="join")
-            ]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-
         update.message.reply_text(
-            "Thank you! Your email has been verified. Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
+            "Thank you! Your email has been verified!")
+        initiate_or_join(update, context)
 
     else:
         keyboard = [
@@ -137,8 +129,15 @@ def initiate_or_join(update, context):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.callback_query.message.reply_text(
-        "Greetings! Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
+    if context.chat_data["state"] == "code":
+        update.message.reply_text(
+            "Greetings! Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
+    elif context.chat_data["state"] == "first_time_no":
+        update.callback_query.message.reply_text(
+            "Greetings! Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
+    else:
+        update.callback_query.message.reply_text(
+            "Greetings! Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
 
     return
 
