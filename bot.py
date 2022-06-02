@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 API_KEY = "5371570532:AAEWry3st7_CFoQo7hJwwehMJvkD0NR-P9Q"
 
-EXPECT_EMAIL = range(1)
+EXPECT_CODE, EXPECT_COURSE, EXPECT_YEAR, EXPECT_LOCATION = range(4)
 
 
 def start(update: Update, context: CallbackContext):
@@ -83,23 +83,26 @@ def permission(update, context):
 
 def email(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id,
-                             text="Hi! Welcome to StudyBuddy Bot! To verify your identity, What is your NUS email? (ending with @u.nus.edu)", reply_markup=ForceReply())
-    return EXPECT_EMAIL
-
-
-def email_input_by_user(update, context):
-    print('do you even run')
-    email = update.message.text
-    update.message.reply_text(email)
-
-    return ConversationHandler.END
-
+                             text="Hi! Welcome to StudyBuddy Bot! To verify your identity, What is your NUS email? (ending with @u.nus.edu)")
+    return
 
 def verification(update, context):
-    update.callback_query.message.reply_text(
-        "A verification code has been sent to your email, please check and enter the code here to complete the verification.")
+    email = update.message.text
+    update.message.reply_text(
+        "A verification code has been sent to " + str(email) + " please check and enter the code here to complete the verification.")
 
-    return
+    return EXPECT_CODE
+
+def code(update,context):
+    keyboard = [[
+        InlineKeyboardButton("Initiate", callback_data="initiate"),
+        InlineKeyboardButton("Join", callback_data="join")]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    update.message.reply_text(
+        "Thank you! Your email has been verified. Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
+    
+    return EXPECT_COURSE
 
 
 def initiate_or_join(update, context):
@@ -174,6 +177,20 @@ def course(update, context):
         "What is your course?")
     return
 
+def year(update, context):
+    course = update.effective_message.text
+    update.message.reply_text("Ah, " + course + "! What year are you in?")
+    return EXPECT_YEAR
+
+def location(update,context):
+    update.message.reply_text("Where would you like to study?")
+    return EXPECT_LOCATION
+
+def random(update,context):
+    place = update.effective_message.text
+    update.message.reply_text(place + ", I see. Good choice!")
+    return ConversationHandler.END
+
 
 def handle_callback_query(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
@@ -234,12 +251,16 @@ def main():
 
     conv_handler = ConversationHandler(
         # TODO: find handler for entry_points
-        entry_points=[],
+        entry_points=[MessageHandler(
+                Filters.regex("@u.nus.edu"), verification)],
         states={
-            EXPECT_EMAIL: [MessageHandler(
-                Filters.regex("@u.nus.edu"), email_input_by_user)]
+            EXPECT_CODE: [MessageHandler(Filters.text, code)],
+            EXPECT_COURSE: [MessageHandler(Filters.text, year)],
+            EXPECT_YEAR: [MessageHandler(Filters.text, location)],
+            EXPECT_LOCATION: [MessageHandler(Filters.text, random)]
         },
-        fallbacks=[CommandHandler('cancel', cancel)]
+        fallbacks=[CommandHandler('cancel', cancel)],
+        allow_reentry=True
     )
 
     dp.add_handler(conv_handler)
