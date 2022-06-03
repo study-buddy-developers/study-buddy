@@ -184,13 +184,13 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     # first_time
     if query.data == "first_time_yes":
         cursor = db.users.find({"userid":update.callback_query.message.from_user.id})
-        if list(cursor) != []:
+        if list(cursor) == []:
             db.users.insert_one({"userid":update.callback_query.message.from_user.id})
         permission(update)
 
     elif query.data == "first_time_no":
         cursor = db.users.find({"userid":update.callback_query.message.from_user.id})
-        if list(cursor) != []:
+        if list(cursor) == []:
             db.users.insert_one({"userid":update.callback_query.message.from_user.id})
         initiate_or_join(update)
 
@@ -201,7 +201,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # initiate_or_join
     elif query.data == "initiate":
-        db.StudySessions.insert_one({"userid":update.callback_query.message.from_user.id}) # where userid is the user ID of the initiator 
+        db.StudySessions.insert_one({"userid":update.callback_query.message.from_user.id}) # where userid is the user ID of the initiator    
         gender(update)
     elif query.data == "join":
         update.callback_query.message.reply_text("handle join")
