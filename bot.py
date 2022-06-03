@@ -11,11 +11,17 @@ EXPECT_TEXT = range(1)
 
 
 def start(update: Update, context: CallbackContext):
+    context.chat_data["state"] = "start"
+
     update.message.reply_text(
         "Hello there, Welcome to the Bot. Please write /help to see the commands available.")
 
+    return
+
 
 def help(update: Update, context: CallbackContext):
+    context.chat_data["state"] = "help"
+
     update.message.reply_text(
         """
     Available Commands:
@@ -24,26 +30,44 @@ def help(update: Update, context: CallbackContext):
     """
     )
 
+    return
+
 
 def unknown_command(update: Update, context: CallbackContext):
+    context.chat_data["state"] = "unknown_command"
+
     update.message.reply_text(
         "Sorry '%s' is not a valid command" % update.message.text)
 
+    return
+
 
 def unknown_text(update: Update, context: CallbackContext):
+    context.chat_data["state"] = "unknown_text"
+
     update.message.reply_text(
         "Sorry I can't recognize you , you said '%s'. Please use /begin to start again." % update.message.text)
 
+    return
+
 
 def user_id(update, context):
+    context.chat_data["state"] = "user_id"
+
     update.message.reply_text(update.message.from_user.id)
+
+    return
 
 
 def begin(update, context):
+    context.chat_data["state"] = "begin"
+
     first_time(update, context)
 
 
 def first_time(update, context):
+    context.chat_data["state"] = "first_time"
+
     keyboard = [
         [
             InlineKeyboardButton("Yes", callback_data="first_time_yes"),
@@ -59,6 +83,8 @@ def first_time(update, context):
 
 
 def permission(update, context):
+    context.chat_data["state"] = "permission"
+
     keyboard = [
         [
             InlineKeyboardButton("Allow", callback_data="permission_allow")
@@ -73,6 +99,8 @@ def permission(update, context):
 
 
 def email(update, context):
+    context.chat_data["state"] = "email"
+
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text="Hi! Welcome to StudyBuddy Bot! To verify your identity, what is your NUS email? (ending with @u.nus.edu)")
 
@@ -80,14 +108,26 @@ def email(update, context):
 
 
 def verification(update, context):
-    email = update.message.text
-    update.message.reply_text(
-        "A verification code has been sent to " + str(email) + " Please check and enter the code here to complete the verification.")
+    context.chat_data["state"] = "verification"
+
+    text = update.message.text
+
+    if text.endswith("@u.nus.edu"):
+        update.message.reply_text(
+            "A verification code has been sent to " + str(text) + " Please check and enter the code here to complete the verification.")
+
+    else:
+        update.message.reply_text(
+            "Sorry, I do not recognise that email. You entered: " + text)
+
+        email(update, context)
 
     return
 
 
 def code(update, context):
+    context.chat_data["state"] = "code"
+
     code = update.effective_message.text
 
     # TODO: get verification code here
@@ -99,21 +139,33 @@ def code(update, context):
         initiate_or_join(update, context)
 
     else:
-        keyboard = [
-            [
-                InlineKeyboardButton("Resend", callback_data="resend")
-            ]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-
         update.message.reply_text(
-            "Sorry, the verification code you have entered is incorrect, please click the resend button for a new code."
-            " If you have entered your email incorrectly, please send your email (ending with @u.nus.edu) again.", reply_markup=reply_markup)
+            "Sorry, the verification code you have entered is incorrect.")
+        wrong_code(update, context)
+
+    return
+
+
+def wrong_code(update, context):
+    context.chat_data["state"] = "wrong_code"
+
+    keyboard = [
+        [
+            InlineKeyboardButton("Resend", callback_data="resend")
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.message.reply_text(
+        "Please click the resend button for a new code."
+        " If you have entered your email incorrectly, please send your email (ending with @u.nus.edu) again.", reply_markup=reply_markup)
 
     return
 
 
 def new_code(update, context):
+    context.chat_data["state"] = "new_code"
+
     update.callback_query.message.reply_text(
         "A new code has been sent to your email. Please check and enter the code here to complete the verification.")
 
@@ -129,21 +181,25 @@ def initiate_or_join(update, context):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    if context.chat_data["state"] == "code":
-        update.message.reply_text(
-            "Greetings! Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
-    elif context.chat_data["state"] == "first_time_no":
+    if context.chat_data["state"] == "first_time":
         update.callback_query.message.reply_text(
+            "Greetings! Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
+    elif context.chat_data["state"] == "code":
+        update.message.reply_text(
             "Greetings! Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
     else:
         print("SOMETHING WENT WRONG HERE")
         update.callback_query.message.reply_text(
             "Greetings! Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
 
+    context.chat_data["state"] = "initiate_or_join"
+
     return
 
 
 def gender(update, context):
+    context.chat_data["state"] = "gender"
+
     keyboard = [
         [
             InlineKeyboardButton("Male", callback_data="male"),
@@ -161,6 +217,8 @@ def gender(update, context):
 
 
 def date(update, context):
+    context.chat_data["state"] = "date"
+
     keyboard = []
 
     col = 0
@@ -191,6 +249,8 @@ def date(update, context):
 
 
 def time(update, context):
+    context.chat_data["state"] = "time"
+
     keyboard = [
         [
             InlineKeyboardButton("Morning <1200", callback_data="morning")
@@ -212,12 +272,16 @@ def time(update, context):
 
 
 def course(update, context):
+    context.chat_data["state"] = "course"
+
     update.callback_query.message.reply_text("What is your course?")
 
     return
 
 
 def year(update, context):
+    context.chat_data["state"] = "year"
+
     keyboard = [
         [
             InlineKeyboardButton("Year One", callback_data="year_one"),
@@ -240,12 +304,16 @@ def year(update, context):
 
 
 def location(update, context):
+    context.chat_data["state"] = "location"
+
     update.callback_query.message.reply_text("Where would you like to study?")
 
     return
 
 
 def pax(update, context):
+    context.chat_data["state"] = "pax"
+
     keyboard = [
         [
             InlineKeyboardButton("2", callback_data="pax_two")
@@ -269,6 +337,8 @@ def pax(update, context):
 
 
 def remark(update, context):
+    context.chat_data["state"] = "remark"
+
     keyboard = [
         [
             InlineKeyboardButton("Yes", callback_data="remark_yes")
@@ -285,7 +355,9 @@ def remark(update, context):
     return
 
 
-def remark_yes(update, context):
+def add_remark(update, context):
+    context.chat_data["state"] = "add_remark"
+
     update.callback_query.message.reply_text(
         "What remark would you like to add?")
 
@@ -301,10 +373,10 @@ def store_data(update, context):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    if context.chat_data["state"] == "remark_done":
+    if context.chat_data["state"] == "add_remark":
         update.message.reply_text(
             "Would you like your data to be stored?", reply_markup=reply_markup)
-    elif context.chat_data["state"] == "remark_no":
+    elif context.chat_data["state"] == "remark":
         update.callback_query.message.reply_text(
             "Would you like your data to be stored?", reply_markup=reply_markup)
     else:
@@ -312,10 +384,14 @@ def store_data(update, context):
         update.callback_query.message.reply_text(
             "Would you like your data to be stored?", reply_markup=reply_markup)
 
+    context.chat_data["state"] = "store_data"
+
     return
 
 
 def which_data(update, context):
+    context.chat_data["state"] = "which_data"
+
     keyboard = [
         [
             InlineKeyboardButton("Gender", callback_data="gender")
@@ -346,6 +422,8 @@ def which_data(update, context):
 
 
 def end(update, context):
+    context.chat_data["state"] = "end"
+
     update.callback_query.message.reply_text(
         "Your study session has been posted successfully! We will update you when someone joined your session")
 
@@ -357,8 +435,6 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     query.answer()
 
     print(query.data)
-
-    context.chat_data["state"] = query.data
 
     # first_time
     if query.data == "first_time_yes":
@@ -378,7 +454,8 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     elif query.data == "initiate":
         gender(update, context)
     elif query.data == "join":
-        update.callback_query.message.reply_text("handle join")
+        # TODO: join
+        print("handle join")
 
     # gender
     elif query.data == "male" or query.data == "female":
@@ -402,7 +479,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # remark_yes or remark_no
     elif query.data == "remark_yes":
-        remark_yes(update, context)
+        add_remark(update, context)
     elif query.data == "remark_no":
         store_data(update, context)
 
@@ -427,45 +504,34 @@ def handle_text(update, context):
 
     print(text)
 
-    if "state" in context.chat_data.keys():
-        print("state: " + context.chat_data["state"])
-        state = context.chat_data["state"]
-    else:
-        state = ""
+    # if "state" in context.chat_data.keys():
+    #     print("state: " + context.chat_data["state"])
+    state = context.chat_data["state"]
+    # else:
+    #     state = ""
 
     # email
-    if state == "permission_allow" and text.endswith("@u.nus.edu"):
-        context.chat_data["state"] = "verification"
+    if (state == "email" or state == "wrong_code"):
         verification(update, context)
 
     # verification code
-    elif (state == "verification" or state == "resend") and text.isnumeric():
-        context.chat_data["state"] = "code"
+    elif (state == "verification" or state == "new_code"):
         code(update, context)
 
-    # redo email
-    elif state == "code" and text.endswith("@u.nus.edu"):
-        context.chat_data["state"] = "verification"
-        verification(update, context)
-
     # course
-    elif (state == "morning" or state == "afternoon" or state == "evening") and text.isalpha():
-        context.chat_data["state"] = "year"
+    elif (state == "course") and text.isalpha():
         year(update, context)
 
     # location
-    elif state == "year_one" or state == "year_two" or state == "year_three" or state == "year_four" or state == "year_five":
-        context.chat_data["state"] = "pax"
+    elif state == "location":
         pax(update, context)
 
-    # remarks
-    elif state == "remark_yes":
-        context.chat_data["state"] = "remark_done"
+    # remark
+    elif state == "add_remark":
         store_data(update, context)
 
     # unknown text
     else:
-        context.chat_data["state"] = ""
         unknown_text(update, context)
 
     return
