@@ -448,9 +448,8 @@ def handle_text(update, context):
         context.chat_data["state"] = "verification"
         verification(update, context)
 
-    # TODO: some bug here
     # course
-    elif state == "morning" or state == "afternoon" or state == "evening" and text.isnumeric():
+    elif (state == "morning" or state == "afternoon" or state == "evening") and text.isalpha():
         context.chat_data["state"] = "year"
         year(update, context)
 
