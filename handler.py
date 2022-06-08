@@ -31,18 +31,17 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     elif query.data == "initiate":
         gender(update, context)
     elif query.data == "join":
-        # TODO: join
-        print("handle join")
+        join_date(update, context)
 
     # gender
     elif query.data == "male" or query.data == "female":
         initiate_date(update, context)
 
-    # date
+    # initiate date
     elif query.data == "date_1" or query.data == "date_2" or query.data == "date_3" or query.data == "date_4" or query.data == "date_5" or query.data == "date_6" or query.data == "date_7":
         initiate_time(update, context)
 
-    # time
+    # initiate time
     elif query.data == "morning" or query.data == "afternoon" or query.data == "evening":
         course(update, context)
 
@@ -72,6 +71,22 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         print("handle store data")
     elif query.data == "done":
         end(update, context)
+
+    # join date
+    elif query.data[:9] == "join_date":
+        join_time(update, context)
+
+    # join time
+    elif query.data == "join_morning":
+        available(update, context, 'Morning')
+    elif query.data == "join_afternoon":
+        available(update, context, 'Afternoon')
+    elif query.data == "join_evening":
+        available(update, context, 'Evening')
+
+    # join session
+    elif query.data == "contact":
+        prompt_contact(update, context)
 
     return
 
