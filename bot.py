@@ -1,5 +1,5 @@
-from telegram import ForceReply, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext.updater import Updater
+<<<<<<< HEAD
 from telegram.update import Update
 from telegram.ext import ConversationHandler, CallbackContext, CommandHandler, MessageHandler
 from telegram.ext import CallbackQueryHandler, Filters, ContextTypes
@@ -239,10 +239,15 @@ def date(update, context):
 
         keyboard[row].append(InlineKeyboardButton(
             curr_day + "/" + curr_month + "/" + curr_year, callback_data="date_"+str(i + 1)))
+=======
+from telegram.ext import CommandHandler, MessageHandler, Filters
+from telegram.ext import CallbackQueryHandler, ConversationHandler
 
-        col += 1
-        col %= 3
+from handler import *
+>>>>>>> 93fe6e3e9c1bc5ac21dc35eaefa9879c608445c2
 
+
+<<<<<<< HEAD
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.callback_query.message.reply_text(
@@ -560,8 +565,11 @@ def handle_text(update, context):
 def cancel(update: Update, context: CallbackContext):
     update.message.reply_text(
         "Conversation cancelled by user. Send /begin to start again.")
+=======
+API_KEY = "5371570532:AAEWry3st7_CFoQo7hJwwehMJvkD0NR-P9Q"
+>>>>>>> 93fe6e3e9c1bc5ac21dc35eaefa9879c608445c2
 
-    return ConversationHandler.END
+EXPECT_TEXT = range(1)
 
 
 def main():
