@@ -1,10 +1,13 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
+import pymongo
 
 from admin import *
 from first_time import *
 from initiate import *
 from join import *
+from credentials import *
+
 
 
 def handle_callback_query(update: Update, context: CallbackContext) -> None:
@@ -15,9 +18,16 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # first_time
     if query.data == "first_time_yes":
-        permission(update, context)
+        cursor = db.users.find({"userid":update.callback_query.message.from_user.id})
+        if list(cursor) == []:
+            db.users.insert_one({"userid":update.callback_query.message.from_user.id})
+        permission(update,context)
+
     elif query.data == "first_time_no":
-        initiate_or_join(update, context)
+        cursor = db.users.find({"userid":update.callback_query.message.from_user.id})
+        if list(cursor) == []:
+            db.users.insert_one({"userid":update.callback_query.message.from_user.id})
+        initiate_or_join(update,context)
 
     # permission
     elif query.data == "permission_allow":
@@ -29,12 +39,16 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # initiate_or_join
     elif query.data == "initiate":
-        gender(update, context)
+        db.StudySessions.insert_one({"userid":update.callback_query.message.from_user.id}) # where userid is the user ID of the initiator    
+        gender(update,context)
     elif query.data == "join":
         join_date(update, context)
 
     # gender
     elif query.data == "male" or query.data == "female":
+        filter_con = { "userid" : update.callback_query.message.from_user.id } 
+        new_con = { "$set" : { 'gender': query.data } }
+        db.users.update_one(filter_con, new_con)
         initiate_date(update, context)
 
     # initiate date
