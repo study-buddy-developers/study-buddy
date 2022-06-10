@@ -1,5 +1,6 @@
 from telegram.ext.updater import Updater
 <<<<<<< HEAD
+<<<<<<< HEAD
 from telegram.update import Update
 from telegram.ext import ConversationHandler, CallbackContext, CommandHandler, MessageHandler
 from telegram.ext import CallbackQueryHandler, Filters, ContextTypes
@@ -240,10 +241,13 @@ def date(update, context):
         keyboard[row].append(InlineKeyboardButton(
             curr_day + "/" + curr_month + "/" + curr_year, callback_data="date_"+str(i + 1)))
 =======
+=======
+>>>>>>> e2e154b217ac7030c79cc3714648d8a46447bae4
 from telegram.ext import CommandHandler, MessageHandler, Filters
 from telegram.ext import CallbackQueryHandler, ConversationHandler
 
 from handler import *
+<<<<<<< HEAD
 >>>>>>> 93fe6e3e9c1bc5ac21dc35eaefa9879c608445c2
 
 
@@ -554,20 +558,23 @@ def handle_text(update, context):
     # remark
     elif state == "add_remark":
         store_data(update, context)
-
-    # unknown text
-    else:
-        unknown_text(update, context)
-
-    return
+=======
+>>>>>>> e2e154b217ac7030c79cc3714648d8a46447bae4
 
 
+
+
+<<<<<<< HEAD
 def cancel(update: Update, context: CallbackContext):
     update.message.reply_text(
         "Conversation cancelled by user. Send /begin to start again.")
 =======
 API_KEY = "5371570532:AAEWry3st7_CFoQo7hJwwehMJvkD0NR-P9Q"
 >>>>>>> 93fe6e3e9c1bc5ac21dc35eaefa9879c608445c2
+=======
+API_KEY = "5371570532:AAEWry3st7_CFoQo7hJwwehMJvkD0NR-P9Q"
+ 
+>>>>>>> e2e154b217ac7030c79cc3714648d8a46447bae4
 
 EXPECT_TEXT = range(1)
 
