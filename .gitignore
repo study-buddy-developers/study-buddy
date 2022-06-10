@@ -127,6 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# credentials
+credentials.py
+
 tempCodeRunnerFile.py
 tempCodeRunnerFile.py
 tempCodeRunnerFile.py
