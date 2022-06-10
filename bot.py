@@ -5,10 +5,7 @@ from telegram.ext import CallbackQueryHandler, ConversationHandler
 from handler import *
 
 
-
-
 API_KEY = "5371570532:AAEWry3st7_CFoQo7hJwwehMJvkD0NR-P9Q"
- 
 
 EXPECT_TEXT = range(1)
 
