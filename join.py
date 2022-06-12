@@ -57,6 +57,7 @@ def join_time(update, context):
 
     return
 
+
 def available(update, context, time):
     keyboard = [
         [
@@ -76,7 +77,8 @@ def available(update, context, time):
 
     return
 
+
 def prompt_contact(update, context):
     update.callback_query.message.reply_text(
         "Please kindly contact your initiator @initiator_telegram_handle")
-    return 
+    return

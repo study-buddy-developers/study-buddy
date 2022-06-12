@@ -3,6 +3,9 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from first_time import first_time
 
+from pymongo import *
+from credentials import *
+
 
 def start(update: Update, context: CallbackContext):
     context.chat_data["state"] = "start"
@@ -55,6 +58,36 @@ def user_id(update, context):
 def begin(update, context):
     context.chat_data["state"] = "begin"
     context.chat_data["id"] = user_id(update, context)
+
     print("User_id: " + str(context.chat_data["id"]))
 
     first_time(update, context)
+
+
+def purge_data(update, context):
+    context.chat_data["gender"] = ""
+    context.chat_data["course"] = ""
+    context.chat_data["year"] = ""
+    context.chat_data["location"] = ""
+    context.chat_data["pax"] = ""
+
+    return
+
+
+def create_study_session(update, context):
+    # date
+    # time
+    # pax
+    # user_id []
+    date_time = str(context.chat_data["initiate_date"]) + \
+        " " + str(context.chat_data["initiate_time"])
+
+    cursor = db.sessions.find(
+        {"$and": [{"date_time": date_time}, {"user_id_array.0": context.chat_data["id"]}]})
+    if list(cursor) == []:
+        db.sessions.insert_many(
+            [{"date_time": date_time}, {"user_id_array.0": context.chat_data["id"]}])
+
+    # filter_con = {"userid": context.chat_data["id"]}
+    # new_con = {"$set": {query.data: context.chat_data[query.data]}}
+    # db.users.update_one(filter_con, new_con)

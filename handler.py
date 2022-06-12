@@ -8,6 +8,8 @@ from initiate import *
 from join import *
 from credentials import *
 
+from datetime import datetime, timedelta
+
 
 def handle_callback_query(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
@@ -57,10 +59,22 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # initiate date
     elif query.data == "date_1" or query.data == "date_2" or query.data == "date_3" or query.data == "date_4" or query.data == "date_5" or query.data == "date_6" or query.data == "date_7":
+        i = int(query.data[-1]) - 1
+
+        curr_date = datetime.now() + timedelta(days=i)
+        curr_day = str(curr_date.day)
+        curr_month = str(curr_date.month)
+        curr_year = str(curr_date.year)
+        date = curr_day + "/" + curr_month + "/" + curr_year
+
+        context.chat_data["initiate_date"] = date
+
         initiate_time(update, context)
 
     # initiate time
     elif query.data == "morning" or query.data == "afternoon" or query.data == "evening":
+        context.chat_data["initiate_time"] = query.data
+
         course(update, context)
 
     # year
@@ -85,6 +99,10 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     elif query.data == "store_data_yes":
         which_data(update, context)
     elif query.data == "store_data_no":
+        create_study_session(update,context)
+        
+        purge_data(update, context)
+
         end(update, context)
 
     # which data
@@ -94,6 +112,10 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         db.users.update_one(filter_con, new_con)
 
     elif query.data == "done":
+        create_study_session(update,context)
+
+        purge_data(update, context)
+
         end(update, context)
 
     # join date
