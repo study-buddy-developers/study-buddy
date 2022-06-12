@@ -1,3 +1,4 @@
+from turtle import up
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from first_time import first_time
@@ -18,7 +19,6 @@ def help(update: Update, context: CallbackContext):
     update.message.reply_text(
         """
     Available Commands:
-    /id - Display user id
     /begin - Start Study Buddy Telegram Bot
     """
     )
@@ -47,12 +47,14 @@ def unknown_text(update: Update, context: CallbackContext):
 def user_id(update, context):
     context.chat_data["state"] = "user_id"
 
-    update.message.reply_text(update.message.from_user.id)
+    # update.message.reply_text(update.message.from_user.id)
 
-    return
+    return update.message.from_user.id
 
 
 def begin(update, context):
     context.chat_data["state"] = "begin"
+    context.chat_data["id"] = user_id(update, context)
+    print("User_id: " + str(context.chat_data["id"]))
 
     first_time(update, context)

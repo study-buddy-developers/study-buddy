@@ -9,7 +9,6 @@ from join import *
 from credentials import *
 
 
-
 def handle_callback_query(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
     query.answer()
@@ -18,16 +17,20 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # first_time
     if query.data == "first_time_yes":
-        cursor = db.users.find({"userid":update.callback_query.message.from_user.id})
+        cursor = db.users.find(
+            {"userid": context.chat_data["id"]})
         if list(cursor) == []:
-            db.users.insert_one({"userid":update.callback_query.message.from_user.id})
-        permission(update,context)
+            db.users.insert_one(
+                {"userid": context.chat_data["id"]})
+        permission(update, context)
 
     elif query.data == "first_time_no":
-        cursor = db.users.find({"userid":update.callback_query.message.from_user.id})
+        cursor = db.users.find(
+            {"userid": context.chat_data["id"]})
         if list(cursor) == []:
-            db.users.insert_one({"userid":update.callback_query.message.from_user.id})
-        initiate_or_join(update,context)
+            db.users.insert_one(
+                {"userid": context.chat_data["id"]})
+        initiate_or_join(update, context)
 
     # permission
     elif query.data == "permission_allow":
@@ -39,15 +42,17 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # initiate_or_join
     elif query.data == "initiate":
-        db.StudySessions.insert_one({"userid":update.callback_query.message.from_user.id}) # where userid is the user ID of the initiator    
-        gender(update,context)
+        # where userid is the user ID of the initiator
+        db.StudySessions.insert_one(
+            {"userid": context.chat_data["id"]})
+        gender(update, context)
     elif query.data == "join":
         join_date(update, context)
 
     # gender
     elif query.data == "male" or query.data == "female":
-        filter_con = { "userid" : update.callback_query.message.from_user.id } 
-        new_con = { "$set" : { 'gender': query.data } }
+        filter_con = {"userid": context.chat_data["id"]}
+        new_con = {"$set": {'gender': query.data}}
         db.users.update_one(filter_con, new_con)
         initiate_date(update, context)
 
@@ -141,6 +146,7 @@ def handle_text(update, context):
         unknown_text(update, context)
 
     return
+
 
 def cancel(update: Update, context: CallbackContext):
     update.message.reply_text(

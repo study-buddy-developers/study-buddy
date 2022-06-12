@@ -19,7 +19,6 @@ def main():
     # adding start command handler to dispatcher.
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
-    dp.add_handler(CommandHandler("id", user_id))
     dp.add_handler(CommandHandler("begin", begin))
     dp.add_handler(CommandHandler("cancel", cancel))
 
