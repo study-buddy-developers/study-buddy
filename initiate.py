@@ -242,4 +242,10 @@ def end(update, context):
     update.callback_query.message.reply_text(
         "Your study session has been posted successfully! We will update you when someone joined your session")
 
+    context.chat_data["gender"] = ""
+    context.chat_data["course"] = ""
+    context.chat_data["year"] = ""
+    context.chat_data["location"] = ""
+    context.chat_data["pax"] = ""
+
     return ConversationHandler.END

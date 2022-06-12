@@ -51,9 +51,8 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # gender
     elif query.data == "male" or query.data == "female":
-        filter_con = {"userid": context.chat_data["id"]}
-        new_con = {"$set": {'gender': query.data}}
-        db.users.update_one(filter_con, new_con)
+        context.chat_data["gender"] = query.data
+
         initiate_date(update, context)
 
     # initiate date
@@ -66,10 +65,14 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # year
     elif query.data == "year_one" or query.data == "year_two" or query.data == "year_three" or query.data == "year_four" or query.data == "year_five":
+        context.chat_data["year"] = query.data
+
         location(update, context)
 
     # pax
     elif query.data == "pax_two" or query.data == "pax_three" or query.data == "pax_four" or query.data == "pax_five":
+        context.chat_data["pax"] = query.data
+
         remark(update, context)
 
     # remark_yes or remark_no
@@ -85,9 +88,11 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         end(update, context)
 
     # which data
-    elif query.data == "gender" or query.data == "course" or query.data == "location" or query.data == "pax":
-        # TODO: store data
-        print("handle store data")
+    elif query.data == "gender" or query.data == "course" or query.data == "year" or query.data == "location" or query.data == "pax":
+        filter_con = {"userid": context.chat_data["id"]}
+        new_con = {"$set": {query.data: context.chat_data[query.data]}}
+        db.users.update_one(filter_con, new_con)
+
     elif query.data == "done":
         end(update, context)
 
@@ -131,10 +136,14 @@ def handle_text(update, context):
 
     # course
     elif (state == "course") and text.isalpha():
+        context.chat_data["course"] = text
+
         year(update, context)
 
     # location
     elif state == "location":
+        context.chat_data["location"] = text
+
         pax(update, context)
 
     # remark
