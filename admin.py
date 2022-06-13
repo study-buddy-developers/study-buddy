@@ -82,12 +82,16 @@ def create_study_session(update, context):
     date_time = str(context.chat_data["initiate_date"]) + \
         " " + str(context.chat_data["initiate_time"])
 
+    # do nothing if there is already a session
     cursor = db.sessions.find(
-        {"$and": [{"date_time": date_time}, {"user_id_array.0": context.chat_data["id"]}]})
+        {"$and": [{"date_time": date_time}, {"user_id_array": [context.chat_data["id"]]}]})
     if list(cursor) == []:
-        db.sessions.insert_many(
-            [{"date_time": date_time}, {"user_id_array.0": context.chat_data["id"]}])
+        db.sessions.insert_one({"date_time": date_time})
 
-    # filter_con = {"userid": context.chat_data["id"]}
-    # new_con = {"$set": {query.data: context.chat_data[query.data]}}
-    # db.users.update_one(filter_con, new_con)
+        filter_con = {"date_time": date_time}
+        new_con = {"$set": {"pax": context.chat_data["pax"]}}
+        db.sessions.update_one(filter_con, new_con)
+
+        filter_con = {"date_time": date_time}
+        new_con = {"$set": {"user_id_array": [context.chat_data["id"]]}}
+        db.sessions.update_one(filter_con, new_con)

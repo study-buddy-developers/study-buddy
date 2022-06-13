@@ -20,18 +20,18 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     # first_time
     if query.data == "first_time_yes":
         cursor = db.users.find(
-            {"userid": context.chat_data["id"]})
+            {"user_id": context.chat_data["id"]})
         if list(cursor) == []:
             db.users.insert_one(
-                {"userid": context.chat_data["id"]})
+                {"user_id": context.chat_data["id"]})
         permission(update, context)
 
     elif query.data == "first_time_no":
         cursor = db.users.find(
-            {"userid": context.chat_data["id"]})
+            {"user_id": context.chat_data["id"]})
         if list(cursor) == []:
             db.users.insert_one(
-                {"userid": context.chat_data["id"]})
+                {"user_id": context.chat_data["id"]})
         initiate_or_join(update, context)
 
     # permission
@@ -44,9 +44,9 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # initiate_or_join
     elif query.data == "initiate":
-        # where userid is the user ID of the initiator
+        # where user_id is the user ID of the initiator
         db.StudySessions.insert_one(
-            {"userid": context.chat_data["id"]})
+            {"user_id": context.chat_data["id"]})
         gender(update, context)
     elif query.data == "join":
         join_date(update, context)
@@ -107,7 +107,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # which data
     elif query.data == "gender" or query.data == "course" or query.data == "year" or query.data == "location" or query.data == "pax":
-        filter_con = {"userid": context.chat_data["id"]}
+        filter_con = {"user_id": context.chat_data["id"]}
         new_con = {"$set": {query.data: context.chat_data[query.data]}}
         db.users.update_one(filter_con, new_con)
 
