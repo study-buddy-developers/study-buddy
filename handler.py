@@ -121,19 +121,30 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # join date
     elif query.data[:9] == "join_date":
+        i = int(query.data[-1]) - 1
+
+        curr_date = datetime.now() + timedelta(days=i)
+        curr_day = str(curr_date.day)
+        curr_month = str(curr_date.month)
+        curr_year = str(curr_date.year)
+        date = curr_day + "/" + curr_month + "/" + curr_year
+
+        context.chat_data["join_date"] = date
+
         join_time(update, context)
 
     # join time
-    elif query.data == "join_morning":
-        available(update, context, 'Morning')
-    elif query.data == "join_afternoon":
-        available(update, context, 'Afternoon')
-    elif query.data == "join_evening":
-        available(update, context, 'Evening')
+    elif query.data[:5] == "join_":
+        context.chat_data["join_time"] = query.data[5:]
+
+        sessions = available_sessions(update, context)
+
+        join_sessions(update, context, sessions)
 
     # join session
     elif query.data == "contact":
-        prompt_contact(update, context)
+        contact = "initiator_telegram_handle"
+        prompt_contact(update, context, contact)
 
     return
 

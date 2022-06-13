@@ -1,4 +1,3 @@
-from turtle import up
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from first_time import first_time
@@ -59,7 +58,7 @@ def begin(update, context):
     context.chat_data["state"] = "begin"
     context.chat_data["id"] = user_id(update, context)
 
-    print("User_id: " + str(context.chat_data["id"]))
+    print("user_id: " + str(context.chat_data["id"]))
 
     first_time(update, context)
 
@@ -75,24 +74,58 @@ def purge_data(update, context):
 
 
 def create_study_session(update, context):
-    # date
-    # time
-    # pax
-    # user_id []
-    date_time = str(context.chat_data["initiate_date"]) + \
-        " " + str(context.chat_data["initiate_time"])
+    # sessions
+    session_id = db.sessions.insert_one(
+        {"user_id_array": [context.chat_data["id"]]}).inserted_id
+    filter_con = {"_id": session_id}
+    new_con = {"$set": {"pax": context.chat_data["pax"]}}
+    db.sessions.update_one(filter_con, new_con)
 
-    # do nothing if there is already a session
-    cursor = db.sessions.find(
-        {"$and": [{"date_time": date_time}, {"user_id_array": [context.chat_data["id"]]}]})
-    # add new session
+    # dates
+    cursor = db.dates.find({"date": context.chat_data["initiate_date"]})
     if list(cursor) == []:
-        db.sessions.insert_one({"date_time": date_time})
+        date_id = db.dates.insert_one(
+            {"date": context.chat_data["initiate_date"]}).inserted_id
+        filter_con = {"_id": date_id}
+        new_con = {"$set": {"morning": []}}
+        db.dates.update_one(filter_con, new_con)
+        new_con = {"$set": {"afternoon": []}}
+        db.dates.update_one(filter_con, new_con)
+        new_con = {"$set": {"evening": []}}
+        db.dates.update_one(filter_con, new_con)
 
-        filter_con = {"date_time": date_time}
-        new_con = {"$set": {"pax": context.chat_data["pax"]}}
-        db.sessions.update_one(filter_con, new_con)
+        new_con = {"$set": {context.chat_data["initiate_time"]: [session_id]}}
+        db.dates.update_one(filter_con, new_con)
+    else:
+        filter_con = {"date": context.chat_data["initiate_date"]}
+        new_con = {"$push": {context.chat_data["initiate_time"]: session_id}}
+        db.dates.update_one(filter_con, new_con)
 
-        filter_con = {"date_time": date_time}
-        new_con = {"$set": {"user_id_array": [context.chat_data["id"]]}}
-        db.sessions.update_one(filter_con, new_con)
+
+def valid_date(update, context, date):
+    cursor = db.dates.find({"date": date})
+    if list(cursor) == []:
+        return False
+    return True
+
+
+def valid_time(update, context, time):
+    date = context.chat_data["join_date"]
+
+    cursor = db.dates.find(
+        {"$and": [{"date": date}, {time: {"$not": {"$size": 0}}}]})
+    if list(cursor) == []:
+        return False
+    return True
+
+
+def available_sessions(update, context):
+    date = context.chat_data["join_date"]
+    time = context.chat_data["join_time"]
+
+    cursor = db.dates.find(
+        {"$and": [{"date": date}, {time: {"$not": {"$size": 0}}}]})
+
+    sessions = list(cursor)[0][time]
+
+    return sessions
