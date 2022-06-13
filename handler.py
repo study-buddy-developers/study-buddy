@@ -99,20 +99,21 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     elif query.data == "store_data_yes":
         which_data(update, context)
     elif query.data == "store_data_no":
-        create_study_session(update,context)
-        
+        create_study_session(update, context)
+
         purge_data(update, context)
 
         end(update, context)
 
     # which data
     elif query.data == "gender" or query.data == "course" or query.data == "year" or query.data == "location" or query.data == "pax":
+        # handle store data
         filter_con = {"user_id": context.chat_data["id"]}
         new_con = {"$set": {query.data: context.chat_data[query.data]}}
         db.users.update_one(filter_con, new_con)
 
     elif query.data == "done":
-        create_study_session(update,context)
+        create_study_session(update, context)
 
         purge_data(update, context)
 
