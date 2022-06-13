@@ -85,6 +85,7 @@ def create_study_session(update, context):
     # do nothing if there is already a session
     cursor = db.sessions.find(
         {"$and": [{"date_time": date_time}, {"user_id_array": [context.chat_data["id"]]}]})
+    # add new session
     if list(cursor) == []:
         db.sessions.insert_one({"date_time": date_time})
 
