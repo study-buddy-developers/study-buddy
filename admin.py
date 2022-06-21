@@ -132,23 +132,45 @@ def available_sessions(update, context):
     for session in sessions:
             cursor = db.sessions.find_one(
                 {"_id": session })
-            total_pax = str(len(cursor["user_id_array"]))
 
+            # pax/total pax
+            pax = str(len(cursor["user_id_array"]))
             pax_str = cursor["pax"][4:]
             if pax_str == "two":
-                pax = "2"
+                total_pax = "2"
             elif pax_str == "three":
-                pax = "3"            
+                total_pax = "3"            
             elif pax_str == "four":
-                pax = "4"            
+                total_pax = "4"            
             elif pax_str == "five":
-                pax = "5"
-            session_details = str(context.chat_data["join_time"]) + " (" + total_pax + "/" + pax + ")"
+                total_pax = "5"
+            
+            initiator_id = cursor["user_id_array"][0]
+            initiator = db.users.find_one({"user_id": initiator_id})
+
+            # year
+            if initiator["year"] == "year_one":
+                year = "Year 1"
+            elif initiator["year"] == "year_two":
+                year = "Year 2"
+            elif initiator["year"] == "year_three":
+                year = "Year 3"
+            elif initiator["year"] == "year_four":
+                year = "Year 4"
+            elif initiator["year"] == "year_five":
+                year = "Year 5"
+
+            # course
+            course = initiator["course"].upper()
+
+            # gender
+            gender = initiator["gender"]
+
+            session_details = str(year + " " + course + ", " + gender + ", " + context.chat_data["join_date"] + 
+            " " + context.chat_data["join_time"]) + " @ " + context.chat_data["location"] + ", " + " (" + pax + "/" + total_pax + " pax)"
             sessions_lst.append(session_details)
     
-    #query "sessions collection" for all elements in "sessions list" 
-    # for each element in sessions list, query len(user_id_array) and pax[4:], use if conditions to turn "one" into 1
-    #  then create "("+pax+"/"+ len() + ")"
-    # (time here:context.chat_data["join_time"] refers to morning afternoon night) 
+# As per this format:
+# Year 3 CEG, Male, 29 Apr 9 AM @ CLB, 4+ pax (Remarks: general revision)
 
     return sessions_lst
