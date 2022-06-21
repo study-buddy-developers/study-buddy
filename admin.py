@@ -127,5 +127,28 @@ def available_sessions(update, context):
         {"$and": [{"date": date}, {time: {"$not": {"$size": 0}}}]})
 
     sessions = list(cursor)[0][time]
+    sessions_lst = []
 
-    return sessions
+    for session in sessions:
+            cursor = db.sessions.find_one(
+                {"_id": session })
+            total_pax = str(len(cursor["user_id_array"]))
+
+            pax_str = cursor["pax"][4:]
+            if pax_str == "two":
+                pax = "2"
+            elif pax_str == "three":
+                pax = "3"            
+            elif pax_str == "four":
+                pax = "4"            
+            elif pax_str == "five":
+                pax = "5"
+            session_details = str(context.chat_data["join_time"]) + " (" + total_pax + "/" + pax + ")"
+            sessions_lst.append(session_details)
+    
+    #query "sessions collection" for all elements in "sessions list" 
+    # for each element in sessions list, query len(user_id_array) and pax[4:], use if conditions to turn "one" into 1
+    #  then create "("+pax+"/"+ len() + ")"
+    # (time here:context.chat_data["join_time"] refers to morning afternoon night) 
+
+    return sessions_lst
