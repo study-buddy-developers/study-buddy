@@ -67,10 +67,11 @@ def join_time(update, context):
 def join_sessions(update, context, sessions):
     keyboard = []
 
-    for session in sessions:
-        session = str(session)
+    for sess in sessions:
+        session = sess[0]
+        sess_ID = sess[1]
         keyboard.append([InlineKeyboardButton(
-            session, callback_data="contact")])
+            session, callback_data="contact_"+ str(sess_ID))])
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 

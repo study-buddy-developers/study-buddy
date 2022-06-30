@@ -82,10 +82,21 @@ def initiate_time(update, context):
 
 def course(update, context):
     context.chat_data["state"] = "course"
+    keyboard = [
+        [
+            InlineKeyboardButton("Computer Engineering", callback_data="CEG")
+        ],
+        [
+            InlineKeyboardButton("Electrical Engineering", callback_data="EE")
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.callback_query.message.reply_text("What is your course?")
+    update.callback_query.message.reply_text(
+        "What is your course?", reply_markup=reply_markup)
 
     return
+
 
 
 def year(update, context):
@@ -106,7 +117,7 @@ def year(update, context):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.message.reply_text(
+    update.callback_query.message.reply_text(
         "What year are you in?", reply_markup=reply_markup)
 
     return

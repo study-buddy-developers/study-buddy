@@ -54,11 +54,21 @@ def user_id(update, context):
     return update.message.from_user.id
 
 
+def tele_handle(update, context):
+    context.chat_data["state"] = "tele_handle"
+
+    # update.message.reply_text(update.message.from_user.username)
+
+    return update.message.from_user.username
+
+
 def begin(update, context):
     context.chat_data["state"] = "begin"
     context.chat_data["id"] = user_id(update, context)
+    context.chat_data["tele_handle"] = tele_handle(update, context)
 
     print("user_id: " + str(context.chat_data["id"]))
+    print("tele_handle: " + str(context.chat_data["tele_handle"]))
 
     first_time(update, context)
 
@@ -80,6 +90,14 @@ def create_study_session(update, context):
     filter_con = {"_id": session_id}
     new_con = {"$set": {"pax": context.chat_data["pax"]}}
     db.sessions.update_one(filter_con, new_con)
+
+    filter_con = {"_id": session_id}
+    new_con = {"$set": {"location": context.chat_data["location"]}}
+    db.sessions.update_one(filter_con, new_con)    
+
+    filter_con = {"_id": session_id}
+    new_con = {"$set": {"remarks": context.chat_data["remarks"]}}
+    db.sessions.update_one(filter_con, new_con)    
 
     # dates
     cursor = db.dates.find({"date": context.chat_data["initiate_date"]})
@@ -150,27 +168,30 @@ def available_sessions(update, context):
 
             # year
             if initiator["year"] == "year_one":
-                year = "Year 1"
+                year = "Y1"
             elif initiator["year"] == "year_two":
-                year = "Year 2"
+                year = "Y2"
             elif initiator["year"] == "year_three":
-                year = "Year 3"
+                year = "Y3"
             elif initiator["year"] == "year_four":
-                year = "Year 4"
+                year = "Y4"
             elif initiator["year"] == "year_five":
-                year = "Year 5"
+                year = "Y5"
 
             # course
-            course = initiator["course"].upper()
+            course = initiator["course"].split("_")[1]
 
             # gender
             gender = initiator["gender"]
 
-            session_details = str(year + " " + course + ", " + gender + ", " + context.chat_data["join_date"] + 
-            " " + context.chat_data["join_time"]) + " @ " + context.chat_data["location"] + ", " + " (" + pax + "/" + total_pax + " pax)"
-            sessions_lst.append(session_details)
-    
-# As per this format:
-# Year 3 CEG, Male, 29 Apr 9 AM @ CLB, 4+ pax (Remarks: general revision)
+            # location
+            location = cursor["location"]
+
+            # remarks
+            remarks = cursor["remarks"]
+
+            session_details = [str(year + " " + course + ", " + gender + ", " + context.chat_data["join_date"] + 
+            " " + context.chat_data["join_time"]) + " @ " + location + ", " + " (" + pax + "/" + total_pax + " pax)" , session]
+            sessions_lst.append(session_details) 
 
     return sessions_lst

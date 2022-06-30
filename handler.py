@@ -10,6 +10,8 @@ from credentials import *
 
 from datetime import datetime, timedelta
 
+from bson.objectid import ObjectId
+
 
 def handle_callback_query(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
@@ -77,6 +79,12 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
         course(update, context)
 
+    # course
+    elif query.data == "EE" or query.data == "CEG":
+        context.chat_data["course"] = query.data
+
+        year(update,context)
+
     # year
     elif query.data == "year_one" or query.data == "year_two" or query.data == "year_three" or query.data == "year_four" or query.data == "year_five":
         context.chat_data["year"] = query.data
@@ -142,8 +150,14 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         join_sessions(update, context, sessions)
 
     # join session
-    elif query.data == "contact":
-        contact = "initiator_telegram_handle"
+    elif query.data[0:8] == "contact_":
+        session_id = query.data[8:]
+        cursor = db.sessions.find_one(
+            {"_id" : ObjectId(session_id)}
+        )
+        userid = cursor["user_id_array"][0]
+        contact = db.users.find_one({"user_id":userid})["tele_handle"]
+
         prompt_contact(update, context, contact)
 
     return
@@ -168,7 +182,7 @@ def handle_text(update, context):
     elif (state == "verification" or state == "new_code"):
         code(update, context)
 
-    # course
+    # course DEPRECATED
     elif (state == "course") and text.isalpha():
         context.chat_data["course"] = text
 
@@ -178,10 +192,16 @@ def handle_text(update, context):
     elif state == "location":
         context.chat_data["location"] = text
 
+        # store telehandle in user db
+        filtercon = {"user_id":context.chat_data["id"]}
+        newcon = {"$set":{"tele_handle":context.chat_data["tele_handle"]}}
+        db.users.update_one(filtercon,newcon)
+
         pax(update, context)
 
     # remark
     elif state == "add_remark":
+        context.chat_data["remarks"] = text
         store_data(update, context)
 
     # unknown text
