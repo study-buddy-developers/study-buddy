@@ -80,7 +80,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         course(update, context)
 
     # course
-    elif query.data == "EE" or query.data == "CEG":
+    elif query.data[0:3] == "CDE":
         context.chat_data["course"] = query.data
 
         year(update,context)

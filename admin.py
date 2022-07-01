@@ -88,16 +88,29 @@ def create_study_session(update, context):
     session_id = db.sessions.insert_one(
         {"user_id_array": [context.chat_data["id"]]}).inserted_id
     filter_con = {"_id": session_id}
+
+    new_con = {"$set": {"date": context.chat_data["initiate_date"]}}
+    db.sessions.update_one(filter_con, new_con)
+
+    new_con = {"$set": {"time": context.chat_data["initiate_time"]}}
+    db.sessions.update_one(filter_con, new_con)
+
+    new_con = {"$set": {"location": context.chat_data["location"]}}
+    db.sessions.update_one(filter_con, new_con)
+
     new_con = {"$set": {"pax": context.chat_data["pax"]}}
     db.sessions.update_one(filter_con, new_con)
 
-    filter_con = {"_id": session_id}
-    new_con = {"$set": {"location": context.chat_data["location"]}}
+    new_con = {"$set": {"year": context.chat_data["year"]}}
     db.sessions.update_one(filter_con, new_con)    
 
-    filter_con = {"_id": session_id}
-    new_con = {"$set": {"remarks": context.chat_data["remarks"]}}
-    db.sessions.update_one(filter_con, new_con)    
+    new_con = {"$set": {"course": context.chat_data["course"]}}
+    db.sessions.update_one(filter_con, new_con)
+
+    new_con = {"$set": {"gender": context.chat_data["gender"]}}
+    db.sessions.update_one(filter_con, new_con)
+
+ 
 
     # dates
     cursor = db.dates.find({"date": context.chat_data["initiate_date"]})
