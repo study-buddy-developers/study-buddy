@@ -201,7 +201,8 @@ def available_sessions(update, context):
             location = cursor["location"]
 
             # remarks
-            remarks = cursor["remarks"]
+            # if "remarks" in cursor:
+            #     remarks = cursor["remarks"]
 
             session_details = [str(year + " " + course + ", " + gender + ", " + context.chat_data["join_date"] + 
             " " + context.chat_data["join_time"]) + " @ " + location + ", " + " (" + pax + "/" + total_pax + " pax)" , session]
