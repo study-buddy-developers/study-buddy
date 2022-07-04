@@ -1,6 +1,6 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
-
+import email_verification
 
 def first_time(update, context):
     context.chat_data["state"] = "first_time"
@@ -50,6 +50,7 @@ def verification(update, context):
     text = update.message.text
 
     if text.endswith("@u.nus.edu"):
+        context.chat_data["verification_code"] = email_verification()
         update.message.reply_text(
             "A verification code has been sent to " + str(text) + " Please check and enter the code here to complete the verification.")
 
@@ -68,16 +69,18 @@ def code(update, context):
     code = update.effective_message.text
 
     # TODO: get verification code here
-    verification_code = "123"
+    verification_code = context.chat_data["verification_code"]
 
     if code == verification_code:
         update.message.reply_text(
             "Thank you! Your email has been verified!")
+        context.chat_data["verification_code"] = ""
         initiate_or_join(update, context)
 
     else:
         update.message.reply_text(
             "Sorry, the verification code you have entered is incorrect.")
+        context.chat_data["verification_code"] = ""
         wrong_code(update, context)
 
     return
@@ -102,7 +105,7 @@ def wrong_code(update, context):
 
 def new_code(update, context):
     context.chat_data["state"] = "new_code"
-
+    context.chat_data["verification_code"] = email_verification()
     update.callback_query.message.reply_text(
         "A new code has been sent to your email. Please check and enter the code here to complete the verification.")
 
