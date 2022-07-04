@@ -84,46 +84,60 @@ def course(update, context):
     context.chat_data["state"] = "course"
     keyboard = [
         [
-            InlineKeyboardButton("Computer Engineering (CEG)", callback_data="CDE_CEG")
+            InlineKeyboardButton(
+                "Computer Engineering (CEG)", callback_data="CDE_CEG")
         ],
         [
-            InlineKeyboardButton("Architecture (ARCH)", callback_data="CDE_ARCH")
+            InlineKeyboardButton("Architecture (ARCH)",
+                                 callback_data="CDE_ARCH")
         ],
         [
-            InlineKeyboardButton("Biomedical Engineering (BME)", callback_data="CDE_BME")
-        ],        
-        [
-            InlineKeyboardButton("Chemical Engineering (CHBE)", callback_data="CDE_CHBE")
+            InlineKeyboardButton(
+                "Biomedical Engineering (BME)", callback_data="CDE_BME")
         ],
         [
-            InlineKeyboardButton("Civil Engineering (CEE)", callback_data="CDE_CEE")
+            InlineKeyboardButton(
+                "Chemical Engineering (CHBE)", callback_data="CDE_CHBE")
         ],
         [
-            InlineKeyboardButton("Engineering Science Programme (ESP)", callback_data="CDE_ESP")
+            InlineKeyboardButton("Civil Engineering (CEE)",
+                                 callback_data="CDE_CEE")
         ],
         [
-            InlineKeyboardButton("Environmental Engineering (ENV)", callback_data="CDE_ENV")
+            InlineKeyboardButton(
+                "Engineering Science Programme (ESP)", callback_data="CDE_ESP")
         ],
         [
-            InlineKeyboardButton("Industrial Design (DID)", callback_data="CDE_DID")
+            InlineKeyboardButton(
+                "Environmental Engineering (ENV)", callback_data="CDE_ENV")
         ],
         [
-            InlineKeyboardButton("Industrial Systems Engineering and Management (ISEM)", callback_data="CDE_ISEM")
+            InlineKeyboardButton("Industrial Design (DID)",
+                                 callback_data="CDE_DID")
         ],
         [
-            InlineKeyboardButton("Infrastructure and project management (IPM)", callback_data="CDE_IPM")
+            InlineKeyboardButton(
+                "Industrial Systems Engineering and Management (ISEM)", callback_data="CDE_ISEM")
         ],
         [
-            InlineKeyboardButton("Landscape architecture (LRCH)", callback_data="CDE_LRCH")
+            InlineKeyboardButton(
+                "Infrastructure and project management (IPM)", callback_data="CDE_IPM")
         ],
         [
-            InlineKeyboardButton("Material Science and Engineering (MSE)", callback_data="CDE_MSE")
+            InlineKeyboardButton(
+                "Landscape architecture (LRCH)", callback_data="CDE_LRCH")
         ],
         [
-            InlineKeyboardButton("Mechanical Engineering (ME)", callback_data="CDE_ME")
+            InlineKeyboardButton(
+                "Material Science and Engineering (MSE)", callback_data="CDE_MSE")
         ],
         [
-            InlineKeyboardButton("Electrical Engineering (EE)", callback_data="CDE_EE")
+            InlineKeyboardButton(
+                "Mechanical Engineering (ME)", callback_data="CDE_ME")
+        ],
+        [
+            InlineKeyboardButton(
+                "Electrical Engineering (EE)", callback_data="CDE_EE")
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -132,7 +146,6 @@ def course(update, context):
         "What is your course?", reply_markup=reply_markup)
 
     return
-
 
 
 def year(update, context):

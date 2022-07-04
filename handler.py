@@ -83,7 +83,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     elif query.data[0:3] == "CDE":
         context.chat_data["course"] = query.data
 
-        year(update,context)
+        year(update, context)
 
     # year
     elif query.data == "year_one" or query.data == "year_two" or query.data == "year_three" or query.data == "year_four" or query.data == "year_five":
@@ -153,10 +153,10 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     elif query.data[0:8] == "contact_":
         session_id = query.data[8:]
         cursor = db.sessions.find_one(
-            {"_id" : ObjectId(session_id)}
+            {"_id": ObjectId(session_id)}
         )
         userid = cursor["user_id_array"][0]
-        contact = db.users.find_one({"user_id":userid})["tele_handle"]
+        contact = db.users.find_one({"user_id": userid})["tele_handle"]
 
         prompt_contact(update, context, contact)
 
@@ -193,9 +193,9 @@ def handle_text(update, context):
         context.chat_data["location"] = text
 
         # store telehandle in user db
-        filtercon = {"user_id":context.chat_data["id"]}
-        newcon = {"$set":{"tele_handle":context.chat_data["tele_handle"]}}
-        db.users.update_one(filtercon,newcon)
+        filtercon = {"user_id": context.chat_data["id"]}
+        newcon = {"$set": {"tele_handle": context.chat_data["tele_handle"]}}
+        db.users.update_one(filtercon, newcon)
 
         pax(update, context)
 
