@@ -156,6 +156,12 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
             {"_id" : ObjectId(session_id)}
         )
         userid = cursor["user_id_array"][0]
+        joiner_id = context.chat_data["id"]
+        print(joiner_id)
+        if joiner_id not in cursor["user_id_array"]:
+            filtercon = {"_id":ObjectId(session_id)}
+            newcon = {"$push":{"user_id_array":joiner_id}}
+            db.sessions.update_one(filtercon,newcon)
         contact = db.users.find_one({"user_id":userid})["tele_handle"]
 
         prompt_contact(update, context, contact)
