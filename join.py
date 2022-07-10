@@ -71,7 +71,7 @@ def join_sessions(update, context, sessions):
         session = sess[0]
         sess_ID = sess[1]
         keyboard.append([InlineKeyboardButton(
-            session, callback_data="contact_"+ str(sess_ID))])
+            session, callback_data="contact_" + str(sess_ID))])
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 

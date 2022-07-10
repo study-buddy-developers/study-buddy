@@ -102,15 +102,13 @@ def create_study_session(update, context):
     db.sessions.update_one(filter_con, new_con)
 
     new_con = {"$set": {"year": context.chat_data["year"]}}
-    db.sessions.update_one(filter_con, new_con)    
+    db.sessions.update_one(filter_con, new_con)
 
     new_con = {"$set": {"course": context.chat_data["course"]}}
     db.sessions.update_one(filter_con, new_con)
 
     new_con = {"$set": {"gender": context.chat_data["gender"]}}
     db.sessions.update_one(filter_con, new_con)
-
- 
 
     # dates
     cursor = db.dates.find({"date": context.chat_data["initiate_date"]})
@@ -161,51 +159,51 @@ def available_sessions(update, context):
     sessions_lst = []
 
     for session in sessions:
-            cursor = db.sessions.find_one(
-                {"_id": session })
+        cursor = db.sessions.find_one(
+            {"_id": session})
 
-            # pax/total pax
-            pax = str(len(cursor["user_id_array"]))
-            pax_str = cursor["pax"][4:]
-            if pax_str == "two":
-                total_pax = "2"
-            elif pax_str == "three":
-                total_pax = "3"            
-            elif pax_str == "four":
-                total_pax = "4"            
-            elif pax_str == "five":
-                total_pax = "5"
-            
-            initiator_id = cursor["user_id_array"][0]
-            initiator = db.users.find_one({"user_id": initiator_id})
+        # pax/total pax
+        pax = str(len(cursor["user_id_array"]))
+        pax_str = cursor["pax"][4:]
+        if pax_str == "two":
+            total_pax = "2"
+        elif pax_str == "three":
+            total_pax = "3"
+        elif pax_str == "four":
+            total_pax = "4"
+        elif pax_str == "five":
+            total_pax = "5"
 
-            # year
-            if initiator["year"] == "year_one":
-                year = "Y1"
-            elif initiator["year"] == "year_two":
-                year = "Y2"
-            elif initiator["year"] == "year_three":
-                year = "Y3"
-            elif initiator["year"] == "year_four":
-                year = "Y4"
-            elif initiator["year"] == "year_five":
-                year = "Y5"
+        initiator_id = cursor["user_id_array"][0]
+        initiator = db.users.find_one({"user_id": initiator_id})
 
-            # course
-            course = initiator["course"].split("_")[1]
+        # year
+        if initiator["year"] == "year_one":
+            year = "Y1"
+        elif initiator["year"] == "year_two":
+            year = "Y2"
+        elif initiator["year"] == "year_three":
+            year = "Y3"
+        elif initiator["year"] == "year_four":
+            year = "Y4"
+        elif initiator["year"] == "year_five":
+            year = "Y5"
 
-            # gender
-            gender = initiator["gender"]
+        # course
+        course = initiator["course"].split("_")[1]
 
-            # location
-            location = cursor["location"]
+        # gender
+        gender = initiator["gender"]
 
-            # remarks
-            # if "remarks" in cursor:
-            #     remarks = cursor["remarks"]
+        # remarks
+        # if "remarks" in cursor:
+        # remarks = cursor["remarks"]
 
-            session_details = [str(year + " " + course + ", " + gender + ", " + context.chat_data["join_date"] + 
-            " " + context.chat_data["join_time"]) + " @ " + location + ", " + " (" + pax + "/" + total_pax + " pax)" , session]
-            sessions_lst.append(session_details) 
+        # location
+        location = cursor["location"]
+
+        session_details = [str(year + " " + course + ", " + gender + ", " + context.chat_data["join_date"] +
+                               " " + context.chat_data["join_time"]) + " @ " + location + ", " + " (" + pax + "/" + total_pax + " pax)", session]
+        sessions_lst.append(session_details)
 
     return sessions_lst
