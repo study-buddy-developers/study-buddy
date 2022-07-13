@@ -74,7 +74,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         initiate_time(update, context)
 
     # initiate time
-    elif query.data == "morning" or query.data == "afternoon" or query.data == "evening":
+    elif query.data[2:] == "00":
         context.chat_data["initiate_time"] = query.data
 
         course(update, context)
