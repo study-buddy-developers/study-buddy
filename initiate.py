@@ -62,14 +62,18 @@ def initiate_time(update, context):
 
     keyboard = [
         [
-            InlineKeyboardButton("Morning <1200", callback_data="morning")
+            InlineKeyboardButton("0900", callback_data="0900"),
+            InlineKeyboardButton("1000", callback_data="1000"),
+            InlineKeyboardButton("1100", callback_data="1100"),
+            InlineKeyboardButton("1200", callback_data="1200"),
+            InlineKeyboardButton("1300", callback_data="1300")
         ],
         [
-            InlineKeyboardButton("Afternoon 1200<=x<=1800",
-                                 callback_data="afternoon")
-        ],
-        [
-            InlineKeyboardButton("Evening >1800", callback_data="evening")
+            InlineKeyboardButton("1400", callback_data="1400"),
+            InlineKeyboardButton("1500", callback_data="1500"),
+            InlineKeyboardButton("1600", callback_data="1600"),
+            InlineKeyboardButton("1700", callback_data="1700"),
+            InlineKeyboardButton("1800", callback_data="1800")
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
