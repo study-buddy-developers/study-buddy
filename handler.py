@@ -92,7 +92,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         location(update, context)
 
     # pax
-    elif query.data == "pax_two" or query.data == "pax_three" or query.data == "pax_four" or query.data == "pax_five":
+    elif query.data == "pax_2" or query.data == "pax_3" or query.data == "pax_4" or query.data == "pax_5":
         context.chat_data["pax"] = query.data
 
         remark(update, context)
@@ -146,8 +146,10 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         context.chat_data["join_time"] = query.data[5:]
 
         sessions = available_sessions(update, context)
-
-        join_sessions(update, context, sessions)
+        if sessions != []:
+            join_sessions(update, context, sessions)
+        else:
+            no_sessions(update,context)
 
     # join session
     elif query.data[0:8] == "contact_":
@@ -162,8 +164,16 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
             filtercon = {"_id":ObjectId(session_id)}
             newcon = {"$push":{"user_id_array":joiner_id}}
             db.sessions.update_one(filtercon,newcon)
-            
+
         contact = db.users.find_one({"user_id":userid})["tele_handle"]
+        # print(len(cursor["user_id_array"]))
+        # print(int(cursor["pax"][-1]))
+        # print(type(len(cursor["user_id_array"])))
+        # print(type(int(cursor["pax"][-1])))
+        # if len(cursor["user_id_array"]) == int(cursor["pax"][-1]): #not executed!!!
+        #     print("attempting to delete")
+        #     db.dates.update_one( {"date":cursor["date"]}, { "$pull": { cursor["time"]:ObjectId(session_id)} } )
+        #     print("deleted")
 
         prompt_contact(update, context, contact)
 

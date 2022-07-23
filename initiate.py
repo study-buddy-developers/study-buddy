@@ -185,16 +185,16 @@ def pax(update, context):
 
     keyboard = [
         [
-            InlineKeyboardButton("2", callback_data="pax_two")
+            InlineKeyboardButton("2", callback_data="pax_2")
         ],
         [
-            InlineKeyboardButton("3", callback_data="pax_three")
+            InlineKeyboardButton("3", callback_data="pax_3")
         ],
         [
-            InlineKeyboardButton("4", callback_data="pax_four")
+            InlineKeyboardButton("4", callback_data="pax_4")
         ],
         [
-            InlineKeyboardButton("5", callback_data="pax_five")
+            InlineKeyboardButton("5", callback_data="pax_5")
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)

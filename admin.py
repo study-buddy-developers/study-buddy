@@ -164,15 +164,7 @@ def available_sessions(update, context):
 
         # pax/total pax
         pax = str(len(cursor["user_id_array"]))
-        pax_str = cursor["pax"][4:]
-        if pax_str == "two":
-            total_pax = "2"
-        elif pax_str == "three":
-            total_pax = "3"
-        elif pax_str == "four":
-            total_pax = "4"
-        elif pax_str == "five":
-            total_pax = "5"
+        total_pax = cursor["pax"][-1]
 
         initiator_id = cursor["user_id_array"][0]
         initiator = db.users.find_one({"user_id": initiator_id})
@@ -204,6 +196,7 @@ def available_sessions(update, context):
 
         session_details = [str(year + " " + course + ", " + gender + ", " + context.chat_data["join_date"] +
                                " " + context.chat_data["join_time"]) + " @ " + location + ", " + " (" + pax + "/" + total_pax + " pax)", session]
-        sessions_lst.append(session_details)
+        if pax != total_pax:
+            sessions_lst.append(session_details)
 
     return sessions_lst

@@ -31,14 +31,26 @@ def join_date(update, context):
 
             col += 1
             col %= 3
+    for elem in keyboard:
+        if elem != []:
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            update.callback_query.message.reply_text(
+                "Please select your desired date for your study session.", reply_markup=reply_markup)
+            return
+    
+    no_sessions(update,context)        
+    return
 
+def no_sessions(update,context):
+    context.chat_data["state"] = "no_sessions"
+    keyboard = [
+        [InlineKeyboardButton("initiate",callback_data="initiate")]
+    ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.callback_query.message.reply_text(
-        "Please select your desired date for your study session.", reply_markup=reply_markup)
-
+        "There are no study sessions available at the moment, would you like to initiate one?", reply_markup=reply_markup)
     return
-
 
 def join_time(update, context):
     context.chat_data["state"] = "join_time"
