@@ -2,16 +2,16 @@ from telegram.ext.updater import Updater
 from telegram.ext import CommandHandler, MessageHandler, Filters
 from telegram.ext import CallbackQueryHandler, ConversationHandler
 
+from credentials import API_KEY
 from handler import *
 
-
-API_KEY = "5371570532:AAEWry3st7_CFoQo7hJwwehMJvkD0NR-P9Q"
 
 EXPECT_TEXT = range(1)
 
 
 def main():
-    updater = Updater(API_KEY, use_context=True)
+    api_key = API_KEY
+    updater = Updater(api_key, use_context=True)
 
     # get dispatcher from updater to register handlers
     dp = updater.dispatcher
