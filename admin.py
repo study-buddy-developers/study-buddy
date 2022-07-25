@@ -123,11 +123,22 @@ def create_study_session(update, context):
         new_con = {"$set": {"evening": []}}
         db.dates.update_one(filter_con, new_con)
 
-        new_con = {"$set": {context.chat_data["initiate_time"]: [session_id]}}
+        if context.chat_data["initiate_time"][0:2]< "12":
+            new_con = {"$set": {"morning": [session_id]}}
+        elif context.chat_data["initiate_time"][0:2] >= "12" and context.chat_data["initiate_time"][0:2] < "17":
+            new_con = {"$set": {"afternoon": [session_id]}}
+        else:
+            new_con = {"$set": {"evening": [session_id]}}
         db.dates.update_one(filter_con, new_con)
     else:
         filter_con = {"date": context.chat_data["initiate_date"]}
-        new_con = {"$push": {context.chat_data["initiate_time"]: session_id}}
+        # context.chat_data["initiate_time"] == "1800" instead of "evening" 0900 to 1800
+        if context.chat_data["initiate_time"][0:2]< "12":
+            new_con = {"$push": {"morning": session_id}}
+        elif context.chat_data["initiate_time"][0:2] >= "12" and context.chat_data["initiate_time"][0:2] < "17":
+            new_con = {"$push": {"afternoon": session_id}}
+        else:
+            new_con = {"$push": {"evening": session_id}}
         db.dates.update_one(filter_con, new_con)
 
 
