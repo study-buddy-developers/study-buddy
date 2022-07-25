@@ -143,10 +143,11 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         context.chat_data["join_time"] = query.data[5:]
 
         sessions = available_sessions(update, context)
+
         if sessions != []:
-            join_sessions(update, context, sessions)
+            join_sessions(update, context)
         else:
-            no_sessions(update,context)
+            no_sessions(update, context)
 
     # join session
     elif query.data[0:8] == "contact_":
@@ -158,11 +159,14 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         joiner_id = context.chat_data["id"]
 
         if joiner_id not in cursor["user_id_array"]:
-            filtercon = {"_id":ObjectId(session_id)}
-            newcon = {"$push":{"user_id_array":joiner_id}}
-            db.sessions.update_one(filtercon,newcon)
+            filtercon = {"_id": ObjectId(session_id)}
+            newcon = {"$push": {"user_id_array": joiner_id}}
+            db.sessions.update_one(filtercon, newcon)
 
-        contact = db.users.find_one({"user_id":userid})["tele_handle"]
+        # contact = db.users.find_one({"user_id":userid})["tele_handle"]
+        context.chat_data["initiator_telegram_handle"] = db.users.find_one(
+            {"user_id": userid})["tele_handle"]
+
         # print(len(cursor["user_id_array"]))
         # print(int(cursor["pax"][-1]))
         # print(type(len(cursor["user_id_array"])))
@@ -172,7 +176,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         #     db.dates.update_one( {"date":cursor["date"]}, { "$pull": { cursor["time"]:ObjectId(session_id)} } )
         #     print("deleted")
 
-        prompt_contact(update, context, contact)
+        prompt_contact(update, context)
 
     return
 

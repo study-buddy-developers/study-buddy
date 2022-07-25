@@ -123,7 +123,7 @@ def create_study_session(update, context):
         new_con = {"$set": {"evening": []}}
         db.dates.update_one(filter_con, new_con)
 
-        if context.chat_data["initiate_time"][0:2]< "12":
+        if context.chat_data["initiate_time"][0:2] < "12":
             new_con = {"$set": {"morning": [session_id]}}
         elif context.chat_data["initiate_time"][0:2] >= "12" and context.chat_data["initiate_time"][0:2] < "17":
             new_con = {"$set": {"afternoon": [session_id]}}
@@ -133,7 +133,7 @@ def create_study_session(update, context):
     else:
         filter_con = {"date": context.chat_data["initiate_date"]}
         # context.chat_data["initiate_time"] == "1800" instead of "evening" 0900 to 1800
-        if context.chat_data["initiate_time"][0:2]< "12":
+        if context.chat_data["initiate_time"][0:2] < "12":
             new_con = {"$push": {"morning": session_id}}
         elif context.chat_data["initiate_time"][0:2] >= "12" and context.chat_data["initiate_time"][0:2] < "17":
             new_con = {"$push": {"afternoon": session_id}}
@@ -177,36 +177,39 @@ def available_sessions(update, context):
         pax = str(len(cursor["user_id_array"]))
         total_pax = cursor["pax"][-1]
 
-        initiator_id = cursor["user_id_array"][0]
-        initiator = db.users.find_one({"user_id": initiator_id})
+        # initiator_id = cursor["user_id_array"][0]
+        # initiator = db.users.find_one({"user_id": initiator_id})
 
         # year
-        if initiator["year"] == "year_one":
+        if cursor["year"] == "year_one":
             year = "Y1"
-        elif initiator["year"] == "year_two":
+        elif cursor["year"] == "year_two":
             year = "Y2"
-        elif initiator["year"] == "year_three":
+        elif cursor["year"] == "year_three":
             year = "Y3"
-        elif initiator["year"] == "year_four":
+        elif cursor["year"] == "year_four":
             year = "Y4"
-        elif initiator["year"] == "year_five":
+        elif cursor["year"] == "year_five":
             year = "Y5"
 
         # course
-        course = initiator["course"].split("_")[1]
+        course = cursor["course"].split("_")[1]
 
         # gender
-        gender = initiator["gender"]
+        gender = cursor["gender"]
+
+        # time
+        time = cursor["time"]
+
+        # location
+        location = cursor["location"]
 
         # remarks
         # if "remarks" in cursor:
         # remarks = cursor["remarks"]
 
-        # location
-        location = cursor["location"]
-
         session_details = [str(year + " " + course + ", " + gender + ", " + context.chat_data["join_date"] +
-                               " " + context.chat_data["join_time"]) + " @ " + location + ", " + " (" + pax + "/" + total_pax + " pax)", session]
+                               " " + time) + " @ " + location + ", " + " (" + pax + "/" + total_pax + " pax)", session]
         if pax != total_pax:
             sessions_lst.append(session_details)
 

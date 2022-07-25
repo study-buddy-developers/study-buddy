@@ -2,7 +2,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from datetime import datetime, timedelta
 
-from admin import valid_date, valid_time
+from admin import valid_date, valid_time, available_sessions
 
 
 def join_date(update, context):
@@ -37,14 +37,15 @@ def join_date(update, context):
             update.callback_query.message.reply_text(
                 "Please select your desired date for your study session.", reply_markup=reply_markup)
             return
-    
-    no_sessions(update,context)        
+
+    no_sessions(update, context)
     return
 
-def no_sessions(update,context):
+
+def no_sessions(update, context):
     context.chat_data["state"] = "no_sessions"
     keyboard = [
-        [InlineKeyboardButton("initiate",callback_data="initiate")]
+        [InlineKeyboardButton("initiate", callback_data="initiate")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -52,14 +53,18 @@ def no_sessions(update,context):
         "There are no study sessions available at the moment, would you like to initiate one?", reply_markup=reply_markup)
     return
 
+
 def join_time(update, context):
     context.chat_data["state"] = "join_time"
 
     keyboard = []
 
     timings = ["morning", "afternoon", "evening"]
-    timings_texts = ["Morning <1200",
-                     "Afternoon 1200<=x<=1800", "Evening >1800"]
+    timings_texts = [
+        "Morning <1200",
+        "Afternoon 1200<=x<=1800",
+        "Evening >1800"
+    ]
 
     for i in range(len(timings)):
         time = timings[i]
@@ -76,8 +81,10 @@ def join_time(update, context):
     return
 
 
-def join_sessions(update, context, sessions):
+def join_sessions(update, context):
     keyboard = []
+
+    sessions = available_sessions(update, context)
 
     for sess in sessions:
         session = sess[0]
@@ -93,7 +100,9 @@ def join_sessions(update, context, sessions):
     return
 
 
-def prompt_contact(update, context, contact):
+def prompt_contact(update, context):
+    contact = context.chat_data["initiator_telegram_handle"]
+
     update.callback_query.message.reply_text(
         "Please kindly contact your initiator @" + contact)
 
