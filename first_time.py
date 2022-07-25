@@ -15,7 +15,8 @@ def first_time(update, context):
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.message.reply_text(
-        "Hi! Welcome to Study Buddy Telegram Bot! Is this your first time using this bot?", reply_markup=reply_markup)
+        "Hi! Welcome to Study Buddy Telegram Bot! Is this your first time using this bot?", reply_markup=reply_markup
+    )
 
     return
 
@@ -31,7 +32,8 @@ def permission(update, context):
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.callback_query.message.reply_text(
-        "Welcome to StudyBuddy Telegram Bot! Before we begin, we would like to ask for your permission to record your telegram handle. All information will be kept confidential in this telegram bot.", reply_markup=reply_markup)
+        "Welcome to StudyBuddy Telegram Bot! Before we begin, we would like to ask for your permission to record your telegram handle. All information will be kept confidential in this telegram bot.", reply_markup=reply_markup
+    )
 
     return
 
@@ -39,8 +41,10 @@ def permission(update, context):
 def email(update, context):
     context.chat_data["state"] = "email"
 
-    context.bot.send_message(chat_id=update.effective_chat.id,
-                             text="Hi! Welcome to StudyBuddy Bot! To verify your identity, what is your NUS email? (ending with @u.nus.edu)")
+    context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="Hi! Welcome to StudyBuddy Bot! To verify your identity, what is your NUS email? (ending with @u.nus.edu)"
+    )
 
     return
 
