@@ -46,9 +46,6 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # initiate_or_join
     elif query.data == "initiate":
-        # where user_id is the user ID of the initiator
-        db.StudySessions.insert_one(
-            {"user_id": context.chat_data["id"]})
         gender(update, context)
     elif query.data == "join":
         join_date(update, context)
