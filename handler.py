@@ -49,7 +49,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         join_date(update, context)
 
     # gender
-    elif query.data == "male" or query.data == "female":
+    elif query.data == "male" or query.data == "female" or query.data == "gender_null":
         context.chat_data["gender"] = query.data
 
         initiate_date(update, context)

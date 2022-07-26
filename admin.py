@@ -198,6 +198,9 @@ def available_sessions(update, context):
         # gender
         gender = cursor["gender"]
 
+        if gender == "gender_null":
+            gender = ""
+
         # time
         time = cursor["time"]
 

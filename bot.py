@@ -4,6 +4,7 @@ from telegram.ext import CallbackQueryHandler, ConversationHandler
 
 from credentials import API_KEY
 from handler import *
+from admin import *
 
 
 EXPECT_TEXT = range(1)
