@@ -20,11 +20,14 @@
 
 ```console
 # clone the repo
-$ git clone https://github.com/study-buddy-developers/study-buddy.git
+git clone https://github.com/study-buddy-developers/study-buddy.git
 
 # change the working directory
-$ cd study-buddy
+cd study-buddy
 
 # install the requirements
-$ python3 -m pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
+
+# run bot
+python3 bot.py
 ```
