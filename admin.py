@@ -112,110 +112,110 @@ def create_study_session(update, context):
     new_con = {"$set": {"gender": context.chat_data["gender"]}}
     db.sessions.update_one(filter_con, new_con)
 
+    new_con = {"$set": {"remarks": context.chat_data["remarks"]}}
+    db.sessions.update_one(filter_con, new_con)
+
     # dates
     cursor = db.dates.find({"date": context.chat_data["initiate_date"]})
     if list(cursor) == []:
         date_id = db.dates.insert_one(
             {"date": context.chat_data["initiate_date"]}).inserted_id
         filter_con = {"_id": date_id}
-        new_con = {"$set": {"morning": []}}
-        db.dates.update_one(filter_con, new_con)
-        new_con = {"$set": {"afternoon": []}}
-        db.dates.update_one(filter_con, new_con)
-        new_con = {"$set": {"evening": []}}
-        db.dates.update_one(filter_con, new_con)
 
-        if context.chat_data["initiate_time"][0:2] < "12":
-            new_con = {"$set": {"morning": [session_id]}}
-        elif context.chat_data["initiate_time"][0:2] >= "12" and context.chat_data["initiate_time"][0:2] < "17":
-            new_con = {"$set": {"afternoon": [session_id]}}
-        else:
-            new_con = {"$set": {"evening": [session_id]}}
+        new_con = {"$set": {"sessions": [session_id]}}
         db.dates.update_one(filter_con, new_con)
     else:
         filter_con = {"date": context.chat_data["initiate_date"]}
-        # context.chat_data["initiate_time"] == "1800" instead of "evening" 0900 to 1800
-        if context.chat_data["initiate_time"][0:2] < "12":
-            new_con = {"$push": {"morning": session_id}}
-        elif context.chat_data["initiate_time"][0:2] >= "12" and context.chat_data["initiate_time"][0:2] < "17":
-            new_con = {"$push": {"afternoon": session_id}}
-        else:
-            new_con = {"$push": {"evening": session_id}}
+        new_con = {"$push": {"sessions": session_id}}
         db.dates.update_one(filter_con, new_con)
 
 
-def valid_date(update, context, date):
-    cursor = db.dates.find({"date": date})
-    if list(cursor) == []:
+def valid_date(date):
+    cursor = db.dates.find_one({"date": date})
+
+    if cursor == None:
+        return False
+
+    sessions = cursor["sessions"]
+
+    for session in sessions:
+        if valid_session(session):
+            return True
+    return False
+
+
+def valid_session(session):
+    cursor = db.sessions.find_one({"_id": session})
+
+    pax = len(cursor["user_id_array"])
+    total_pax = cursor["pax"][-1]
+
+    if pax == total_pax:
         return False
     return True
 
 
-def valid_time(update, context, time):
-    date = context.chat_data["join_date"]
+# def valid_time(update, context, time):
+#     date = context.chat_data["join_date"]
 
-    cursor = db.dates.find(
-        {"$and": [{"date": date}, {time: {"$not": {"$size": 0}}}]})
-    if list(cursor) == []:
-        return False
-    return True
+#     cursor = db.dates.find(
+#         {"$and": [{"date": date}, {time: {"$not": {"$size": 0}}}]})
+#     if list(cursor) == []:
+#         return False
+#     return True
 
 
 def available_sessions(update, context):
     date = context.chat_data["join_date"]
-    time = context.chat_data["join_time"]
 
-    cursor = db.dates.find(
-        {"$and": [{"date": date}, {time: {"$not": {"$size": 0}}}]})
+    cursor = db.dates.find_one({"date": date})
 
-    sessions = list(cursor)[0][time]
-    sessions_lst = []
+    sessions = cursor["sessions"]
 
+    valid_sessions = []
     for session in sessions:
-        cursor = db.sessions.find_one(
-            {"_id": session})
+        if valid_session(session):
+            cursor = db.sessions.find_one({"_id": session})
 
-        # pax/total pax
-        pax = str(len(cursor["user_id_array"]))
-        total_pax = cursor["pax"][-1]
+            # current pax
+            current_pax = len(cursor["user_id_array"])
 
-        # initiator_id = cursor["user_id_array"][0]
-        # initiator = db.users.find_one({"user_id": initiator_id})
+            # time
+            time = cursor["time"]
 
-        # year
-        if cursor["year"] == "year_one":
-            year = "Y1"
-        elif cursor["year"] == "year_two":
-            year = "Y2"
-        elif cursor["year"] == "year_three":
-            year = "Y3"
-        elif cursor["year"] == "year_four":
-            year = "Y4"
-        elif cursor["year"] == "year_five":
-            year = "Y5"
+            # location
+            location = cursor["location"]
 
-        # course
-        course = cursor["course"].split("_")[1]
+            # pax
+            pax = cursor["pax"][-1]
 
-        # gender
-        gender = cursor["gender"]
+            # year
+            if cursor["year"] == "year_one":
+                year = "Y1"
+            elif cursor["year"] == "year_two":
+                year = "Y2"
+            elif cursor["year"] == "year_three":
+                year = "Y3"
+            elif cursor["year"] == "year_four":
+                year = "Y4"
+            elif cursor["year"] == "year_five":
+                year = "Y5"
 
-        if gender == "gender_null":
-            gender = ""
+            # course
+            course = cursor["course"].split("_")[1]
 
-        # time
-        time = cursor["time"]
+            # gender
+            gender = cursor["gender"]
 
-        # location
-        location = cursor["location"]
+            if gender == "gender_null":
+                gender = ""
 
-        # remarks
-        # if "remarks" in cursor:
-        # remarks = cursor["remarks"]
+            # remarks
+            remarks = cursor["remarks"]
 
-        session_details = [str(year + " " + course + ", " + gender + ", " + context.chat_data["join_date"] +
-                               " " + time) + " @ " + location + ", " + " (" + pax + "/" + total_pax + " pax)", session]
-        if pax != total_pax:
-            sessions_lst.append(session_details)
+            session_details = [str(year) + " " + str(course) + ", " + str(gender) + ", " + str(date) + " " + str(
+                time) + " @" + str(location) + " (" + str(current_pax) + "/" + str(pax) + " pax)", session]
 
-    return sessions_lst
+            valid_sessions.append(session_details)
+
+    return valid_sessions

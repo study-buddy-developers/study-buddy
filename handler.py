@@ -46,7 +46,19 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     elif query.data == "initiate":
         gender(update, context)
     elif query.data == "join":
-        join_date(update, context)
+        for i in range(7):
+            curr_date = datetime.now() + timedelta(days=i)
+            curr_day = str(curr_date.day)
+            curr_month = str(curr_date.month)
+            curr_year = str(curr_date.year)
+
+            date = curr_day + "/" + curr_month + "/" + curr_year
+
+            if valid_date(date):
+                join_date(update, context)
+                return
+
+        no_sessions(update, context)
 
     # gender
     elif query.data == "male" or query.data == "female" or query.data == "gender_null":
@@ -94,8 +106,12 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # remark_yes or remark_no
     elif query.data == "remark_yes":
+        context.chat_data["remarks"] = ""
+
         add_remark(update, context)
     elif query.data == "remark_no":
+        context.chat_data["remarks"] = ""
+
         store_data(update, context)
 
     # store data
@@ -124,7 +140,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # join date
     elif query.data[:9] == "join_date":
-        i = int(query.data[-1]) - 1
+        i = int(query.data[-1])
 
         curr_date = datetime.now() + timedelta(days=i)
         curr_day = str(curr_date.day)
@@ -134,25 +150,27 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
         context.chat_data["join_date"] = date
 
-        join_time(update, context)
+        join_sessions(update, context)
 
     # join time
-    elif query.data[:5] == "join_":
-        context.chat_data["join_time"] = query.data[5:]
+    # elif query.data[:5] == "join_":
+    #     context.chat_data["join_time"] = query.data[5:]
 
-        sessions = available_sessions(update, context)
+    #     sessions = available_sessions(update, context)
 
-        if sessions != []:
-            join_sessions(update, context)
-        else:
-            no_sessions(update, context)
+    #     if sessions != []:
+    #         join_sessions(update, context)
+    #     else:
+    #         no_sessions(update, context)
 
     # join session
-    elif query.data[0:8] == "contact_":
-        session_id = query.data[8:]
+    elif query.data[:13] == "join_session_":
+        session_id = query.data[13:]
+
         cursor = db.sessions.find_one(
             {"_id": ObjectId(session_id)}
         )
+
         userid = cursor["user_id_array"][0]
         joiner_id = context.chat_data["id"]
 
@@ -218,6 +236,7 @@ def handle_text(update, context):
     # remark
     elif state == "add_remark":
         context.chat_data["remarks"] = text
+
         store_data(update, context)
 
     # unknown text
