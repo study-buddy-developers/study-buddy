@@ -14,6 +14,7 @@ def first_time(update, context):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
+    # update.message.reply_photo(photo=open(r'assets\logo_size.jpg', 'rb'))
     update.message.reply_text(
         "Hi! Welcome to Study Buddy Telegram Bot! Is this your first time using this bot?", reply_markup=reply_markup
     )

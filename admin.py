@@ -1,9 +1,10 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
-from first_time import first_time
+#from first_time import first_time
 
 from pymongo import *
 from credentials import *
+from user_identify import user_identify
 
 
 def start(update: Update, context: CallbackContext):
@@ -70,7 +71,8 @@ def begin(update, context):
     print("user_id: " + str(context.chat_data["id"]))
     print("tele_handle: " + str(context.chat_data["tele_handle"]))
 
-    first_time(update, context)
+#   first_time(update, context)
+    user_identify(update, context)
 
 
 def purge_data(update, context):
