@@ -53,33 +53,6 @@ def no_sessions(update, context):
     return
 
 
-# def join_time(update, context):
-#     context.chat_data["state"] = "join_time"
-
-#     keyboard = []
-
-#     timings = ["morning", "afternoon", "evening"]
-#     timings_texts = [
-#         "Morning <1200",
-#         "Afternoon 1200<=x<=1800",
-#         "Evening >1800"
-#     ]
-
-#     for i in range(len(timings)):
-#         time = timings[i]
-
-#         if valid_time(update, context, time):
-#             keyboard.append([InlineKeyboardButton(
-#                 timings_texts[i], callback_data="join_"+time)])
-
-#     reply_markup = InlineKeyboardMarkup(keyboard)
-
-#     update.callback_query.message.reply_text(
-#         "What time would you like to have your study session?", reply_markup=reply_markup)
-
-#     return
-
-
 def join_sessions(update, context):
     keyboard = []
 

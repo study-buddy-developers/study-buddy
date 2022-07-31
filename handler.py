@@ -18,24 +18,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     print(query.data)
 
     # first_time
-    if query.data == "first_time_yes":
-        cursor = db.users.find(
-            {"user_id": context.chat_data["id"]})
-        if list(cursor) == []:
-            db.users.insert_one(
-                {"user_id": context.chat_data["id"]})
-        permission(update, context)
-
-    elif query.data == "first_time_no":
-        cursor = db.users.find(
-            {"user_id": context.chat_data["id"]})
-        if list(cursor) == []:
-            db.users.insert_one(
-                {"user_id": context.chat_data["id"]})
-        initiate_or_join(update, context)
-
-    # permission
-    elif query.data == "permission_allow":
+    if query.data == "acknowledge":
         email(update, context)
 
     # resend verification code
@@ -127,7 +110,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     # which data
     elif query.data == "gender" or query.data == "course" or query.data == "year" or query.data == "location" or query.data == "pax":
         # handle store data
-        filter_con = {"user_id": context.chat_data["id"]}
+        filter_con = {"user_id": context.chat_data["user_id"]}
         new_con = {"$set": {query.data: context.chat_data[query.data]}}
         db.users.update_one(filter_con, new_con)
 
@@ -172,7 +155,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         )
 
         userid = cursor["user_id_array"][0]
-        joiner_id = context.chat_data["id"]
+        joiner_id = context.chat_data["user_id"]
 
         if joiner_id not in cursor["user_id_array"]:
             filtercon = {"_id": ObjectId(session_id)}
@@ -227,7 +210,7 @@ def handle_text(update, context):
         context.chat_data["location"] = text
 
         # store telehandle in user db
-        filtercon = {"user_id": context.chat_data["id"]}
+        filtercon = {"user_id": context.chat_data["user_id"]}
         newcon = {"$set": {"tele_handle": context.chat_data["tele_handle"]}}
         db.users.update_one(filtercon, newcon)
 

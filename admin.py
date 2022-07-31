@@ -1,10 +1,9 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
-#from first_time import first_time
 
 from pymongo import *
 from credentials import *
-from user_identify import user_identify
+from first_time import first_time, initiate_or_join
 
 
 def start(update: Update, context: CallbackContext):
@@ -47,35 +46,39 @@ def unknown_text(update: Update, context: CallbackContext):
     return
 
 
-def user_id(update, context):
-    context.chat_data["state"] = "user_id"
-
-    # update.message.reply_text(update.message.from_user.id)
-
-    return update.message.from_user.id
-
-
-def tele_handle(update, context):
-    context.chat_data["state"] = "tele_handle"
-
-    # update.message.reply_text(update.message.from_user.username)
-
-    return update.message.from_user.username
-
-
 def begin(update, context):
     context.chat_data["state"] = "begin"
-    context.chat_data["id"] = user_id(update, context)
-    context.chat_data["tele_handle"] = tele_handle(update, context)
 
-    print("user_id: " + str(context.chat_data["id"]))
-    print("tele_handle: " + str(context.chat_data["tele_handle"]))
+    context.chat_data["user_id"] = str(update.message.from_user.id)
+    context.chat_data["tele_handle"] = str(update.message.from_user.username)
 
-#   first_time(update, context)
-    user_identify(update, context)
+    print("user_id: " + context.chat_data["user_id"])
+    print("tele_handle: " + context.chat_data["tele_handle"])
+
+    user_identification(update, context)
+
+    return
+
+
+def user_identification(update, context):
+    context.chat_data["state"] = "user_identification"
+
+    cursor = db.users.find_one({"user_id": context.chat_data["user_id"]})
+
+    if cursor == None:
+        first_time(update, context)
+    else:
+        update.message.reply_text(
+            "Welcome back " + cursor["tele_handle"] + "! What do we planned for this week?")
+
+        initiate_or_join(update, context)
+
+    return
 
 
 def purge_data(update, context):
+    # context._chat_id_and_data[1] = ""
+
     context.chat_data["gender"] = ""
     context.chat_data["course"] = ""
     context.chat_data["year"] = ""
@@ -88,7 +91,7 @@ def purge_data(update, context):
 def create_study_session(update, context):
     # sessions
     session_id = db.sessions.insert_one(
-        {"user_id_array": [context.chat_data["id"]]}).inserted_id
+        {"user_id_array": [context.chat_data["user_id"]]}).inserted_id
     filter_con = {"_id": session_id}
 
     new_con = {"$set": {"date": context.chat_data["initiate_date"]}}

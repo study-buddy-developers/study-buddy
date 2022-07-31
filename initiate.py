@@ -2,9 +2,6 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext, ConversationHandler
 from datetime import datetime, timedelta
 
-from pymongo import *
-from credentials import *
-
 
 def gender(update, context):
     context.chat_data["state"] = "gender"
