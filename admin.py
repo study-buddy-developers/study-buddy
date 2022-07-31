@@ -198,7 +198,7 @@ def available_sessions(update, context):
             remarks = cursor["remarks"]
 
             session_details = [str(year) + " " + str(course) + ", " + str(gender) + ", " + str(date) + " " + str(
-                time) + " @" + str(location) + " (" + str(current_pax) + "/" + str(pax) + " pax)", session]
+                time) + "H @" + str(location) + " (Remarks: " + str(remarks) + ") (" + str(current_pax) + "/" + str(pax) + " pax)", session]
 
             valid_sessions.append(session_details)
 
