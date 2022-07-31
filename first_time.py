@@ -16,9 +16,9 @@ def first_time(update, context):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    # TODO insert terms of service here
+    # terms and conditions
     update.message.reply_text(
-        "Welcome to StudyBuddy Telegram Bot!\nBefore we begin, we would like to ask for your permission to record your telegram handle.\nTerms and Conditions\n\nOur terms and conditions were last updated on 30th Jul 2022.\n\nPlease read these terms and conditions carefully before using our telegram bot.\n\n*Our mission is to provide a platform for ECE students to find their study buddies*\n\n*All the data that is collected by the bot will be kept confidential*\n\n*You telegram handle will be sent to the students who are in the same session*\n\nWith all that have been said, have fun with the bot and happy studying!", reply_markup=reply_markup
+        "Welcome to StudyBuddy Telegram Bot!\nBefore we begin, please read through these terms and conditions carefully.\n\n*Our mission is to provide a platform for ECE students to find their study buddies*\n\n*All the data that is collected by the bot will be kept confidential*\n\n*Your telegram handle will be sent to the students who are in the same session*\n\nOur terms and conditions were last updated on 30th Jul 2022.\n\nWith all that have been said, have fun with the bot and happy studying!", reply_markup=reply_markup
     )
 
     return
