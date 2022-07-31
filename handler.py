@@ -61,8 +61,10 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     elif query.data[2:] == "00":
         context.chat_data["initiate_time"] = query.data
 
-        check_data(update, context)
-        update_data(update, context)
+        if len(check_data(update, context)) == 0:
+            next_data(update, context)
+        else:
+            update_data(update, context)
 
     # update_data_done
     elif query.data == "update_done":
@@ -125,6 +127,8 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         filter_con = {"user_id": context.chat_data["user_id"]}
         new_con = {"$set": {query.data: context.chat_data[query.data]}}
         db.users.update_one(filter_con, new_con)
+
+        # TODO use context.chat_data["updated_data"]
 
         context.chat_data["stored_data"].remove(query.data)
 
