@@ -148,60 +148,61 @@ def course(update, context):
     keyboard = [
         [
             InlineKeyboardButton(
-                "Computer Engineering (CEG)", callback_data="CDE_CEG")
-        ],
-        [
-            InlineKeyboardButton("Architecture (ARCH)",
-                                 callback_data="CDE_ARCH")
-        ],
-        [
-            InlineKeyboardButton(
-                "Biomedical Engineering (BME)", callback_data="CDE_BME")
-        ],
-        [
-            InlineKeyboardButton(
-                "Chemical Engineering (CHBE)", callback_data="CDE_CHBE")
-        ],
-        [
-            InlineKeyboardButton("Civil Engineering (CEE)",
-                                 callback_data="CDE_CEE")
-        ],
-        [
-            InlineKeyboardButton(
-                "Engineering Science Programme (ESP)", callback_data="CDE_ESP")
-        ],
-        [
-            InlineKeyboardButton(
-                "Environmental Engineering (ENV)", callback_data="CDE_ENV")
-        ],
-        [
-            InlineKeyboardButton("Industrial Design (DID)",
-                                 callback_data="CDE_DID")
-        ],
-        [
-            InlineKeyboardButton(
-                "Industrial Systems Engineering and Management (ISEM)", callback_data="CDE_ISEM")
-        ],
-        [
-            InlineKeyboardButton(
-                "Infrastructure and project management (IPM)", callback_data="CDE_IPM")
-        ],
-        [
-            InlineKeyboardButton(
-                "Landscape architecture (LRCH)", callback_data="CDE_LRCH")
-        ],
-        [
-            InlineKeyboardButton(
-                "Material Science and Engineering (MSE)", callback_data="CDE_MSE")
-        ],
-        [
-            InlineKeyboardButton(
-                "Mechanical Engineering (ME)", callback_data="CDE_ME")
-        ],
-        [
-            InlineKeyboardButton(
                 "Electrical Engineering (EE)", callback_data="CDE_EE")
+        ],
+        [
+            InlineKeyboardButton(
+                "Computer Engineering (CEG)", callback_data="CDE_CEG")
         ]
+
+        # [
+        #     InlineKeyboardButton("Architecture (ARCH)",
+        #                          callback_data="CDE_ARCH")
+        # ],
+        # [
+        #     InlineKeyboardButton(
+        #         "Biomedical Engineering (BME)", callback_data="CDE_BME")
+        # ],
+        # [
+        #     InlineKeyboardButton(
+        #         "Chemical Engineering (CHBE)", callback_data="CDE_CHBE")
+        # ],
+        # [
+        #     InlineKeyboardButton("Civil Engineering (CEE)",
+        #                          callback_data="CDE_CEE")
+        # ],
+        # [
+        #     InlineKeyboardButton(
+        #         "Engineering Science Programme (ESP)", callback_data="CDE_ESP")
+        # ],
+        # [
+        #     InlineKeyboardButton(
+        #         "Environmental Engineering (ENV)", callback_data="CDE_ENV")
+        # ],
+        # [
+        #     InlineKeyboardButton("Industrial Design (DID)",
+        #                          callback_data="CDE_DID")
+        # ],
+        # [
+        #     InlineKeyboardButton(
+        #         "Industrial Systems Engineering and Management (ISEM)", callback_data="CDE_ISEM")
+        # ],
+        # [
+        #     InlineKeyboardButton(
+        #         "Infrastructure and project management (IPM)", callback_data="CDE_IPM")
+        # ],
+        # [
+        #     InlineKeyboardButton(
+        #         "Landscape architecture (LRCH)", callback_data="CDE_LRCH")
+        # ],
+        # [
+        #     InlineKeyboardButton(
+        #         "Material Science and Engineering (MSE)", callback_data="CDE_MSE")
+        # ],
+        # [
+        #     InlineKeyboardButton(
+        #         "Mechanical Engineering (ME)", callback_data="CDE_ME")
+        # ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
