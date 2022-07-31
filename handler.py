@@ -128,8 +128,6 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         new_con = {"$set": {query.data: context.chat_data[query.data]}}
         db.users.update_one(filter_con, new_con)
 
-        # TODO use context.chat_data["updated_data"]
-
         context.chat_data["stored_data"].remove(query.data)
 
         edit_which_data(update, context)

@@ -14,6 +14,8 @@ from first_time import first_time, initiate_or_join
 def start(update: Update, context: CallbackContext):
     context.chat_data["state"] = "start"
 
+    context.chat_data.clear()
+
     context.chat_data["user_id"] = str(update.message.from_user.id)
     context.chat_data["tele_handle"] = str(update.message.from_user.username)
 

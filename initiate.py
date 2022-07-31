@@ -74,8 +74,8 @@ def update_data(update, context):
     for data in stored_data:
         keyboard.append(
             [
-                InlineKeyboardButton(parse_data(
-                    data), callback_data="update_" + data)
+                InlineKeyboardButton(
+                    data.capitalize(), callback_data="update_" + data)
             ]
         )
     keyboard.append([InlineKeyboardButton(
@@ -97,8 +97,8 @@ def edit_update_data(update, context):
     for data in stored_data:
         keyboard.append(
             [
-                InlineKeyboardButton(parse_data(
-                    data), callback_data="update_" + data)
+                InlineKeyboardButton(
+                    data.capitalize(), callback_data="update_" + data)
             ]
         )
     keyboard.append([InlineKeyboardButton(
@@ -339,12 +339,9 @@ def which_data(update, context):
 
     keyboard = []
     for data in stored_data:
-        try:
-            context.chat_data[data]
+        if data in context.chat_data:
             keyboard.append([InlineKeyboardButton(
                 data.capitalize(), callback_data=data)])
-        except:
-            continue
     keyboard.append([InlineKeyboardButton("Done", callback_data="store_done")])
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -361,12 +358,9 @@ def edit_which_data(update, context):
 
     keyboard = []
     for data in stored_data:
-        try:
-            context.chat_data[data]
+        if data in context.chat_data:
             keyboard.append([InlineKeyboardButton(
                 data.capitalize(), callback_data=data)])
-        except:
-            continue
     keyboard.append([InlineKeyboardButton("Done", callback_data="store_done")])
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -410,31 +404,32 @@ def check_data(update, context):
     return stored_data
 
 
-def parse_data(data):
-    return data.capitalize()
-
-
 def next_data(update, context):
-    if "year" not in context.chat_data["stored_data"]:
-        year(update, context)
-        context.chat_data["stored_data"].append("year")
-    elif "course" not in context.chat_data["stored_data"]:
-        course(update, context)
-        context.chat_data["stored_data"].append("course")
-    elif "gender" not in context.chat_data["stored_data"]:
-        gender(update, context)
-        context.chat_data["stored_data"].append("gender")
-    elif "location" not in context.chat_data["stored_data"]:
-        location(update, context)
-        context.chat_data["stored_data"].append("location")
-    elif "pax" not in context.chat_data["stored_data"]:
-        pax(update, context)
-        context.chat_data["stored_data"].append("pax")
-    elif "remarks" not in context.chat_data["stored_data"]:
-        remark(update, context)
-        context.chat_data["stored_data"].append("remarks")
-    else:
-        store_data(update, context)
+    data = ["year", "course", "gender", "location", "pax", "remarks"]
+
+    for d in data:
+        if d not in context.chat_data["stored_data"]:
+            if d == "year":
+                year(update, context)
+                context.chat_data["stored_data"].append("year")
+            elif d == "course":
+                course(update, context)
+                context.chat_data["stored_data"].append("course")
+            elif d == "gender":
+                gender(update, context)
+                context.chat_data["stored_data"].append("gender")
+            elif d == "location":
+                location(update, context)
+                context.chat_data["stored_data"].append("location")
+            elif d == "pax":
+                pax(update, context)
+                context.chat_data["stored_data"].append("pax")
+            elif d == "remarks":
+                remark(update, context)
+                context.chat_data["stored_data"].append("remarks")
+            return
+
+    store_data(update, context)
 
     return
 
@@ -451,47 +446,16 @@ def create_study_session(update, context):
     new_con = {"$set": {"time": context.chat_data["initiate_time"]}}
     db.sessions.update_one(filter_con, new_con)
 
-    try:
-        new_con = {"$set": {"year": context.chat_data["year"]}}
-    except:
-        cursor = db.users.find_one({"user_id": context.chat_data["user_id"]})
-        new_con = {"$set": {"year": cursor["year"]}}
-    db.sessions.update_one(filter_con, new_con)
+    data = ["year", "course", "gender", "location", "pax", "remarks"]
 
-    try:
-        new_con = {"$set": {"course": context.chat_data["course"]}}
-    except:
-        cursor = db.users.find_one({"user_id": context.chat_data["user_id"]})
-        new_con = {"$set": {"course": cursor["course"]}}
-    db.sessions.update_one(filter_con, new_con)
-
-    try:
-        new_con = {"$set": {"gender": context.chat_data["gender"]}}
-    except:
-        cursor = db.users.find_one({"user_id": context.chat_data["user_id"]})
-        new_con = {"$set": {"gender": cursor["gender"]}}
-    db.sessions.update_one(filter_con, new_con)
-
-    try:
-        new_con = {"$set": {"location": context.chat_data["location"]}}
-    except:
-        cursor = db.users.find_one({"user_id": context.chat_data["user_id"]})
-        new_con = {"$set": {"location": cursor["location"]}}
-    db.sessions.update_one(filter_con, new_con)
-
-    try:
-        new_con = {"$set": {"pax": context.chat_data["pax"]}}
-    except:
-        cursor = db.users.find_one({"user_id": context.chat_data["user_id"]})
-        new_con = {"$set": {"pax": cursor["pax"]}}
-    db.sessions.update_one(filter_con, new_con)
-
-    try:
-        new_con = {"$set": {"remarks": context.chat_data["remarks"]}}
-    except:
-        cursor = db.users.find_one({"user_id": context.chat_data["user_id"]})
-        new_con = {"$set": {"remarks": cursor["remarks"]}}
-    db.sessions.update_one(filter_con, new_con)
+    for d in data:
+        if d in context.chat_data:
+            new_con = {"$set": {d: context.chat_data[d]}}
+        else:
+            cursor = db.users.find_one(
+                {"user_id": context.chat_data["user_id"]})
+            new_con = {"$set": {d: cursor[d]}}
+        db.sessions.update_one(filter_con, new_con)
 
     # dates
     cursor = db.dates.find({"date": context.chat_data["initiate_date"]})
@@ -509,13 +473,6 @@ def create_study_session(update, context):
 
 
 def purge_data(update, context):
-    # context._chat_id_and_data[1] = ""
-
-    context.chat_data["gender"] = ""
-    context.chat_data["course"] = ""
-    context.chat_data["year"] = ""
-    context.chat_data["location"] = ""
-    context.chat_data["pax"] = ""
-    context.chat_data["remarks"] = ""
+    context.chat_data.clear()
 
     return
