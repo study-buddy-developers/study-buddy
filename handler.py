@@ -153,17 +153,6 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
         join_sessions(update, context)
 
-    # join time
-    # elif query.data[:5] == "join_":
-    #     context.chat_data["join_time"] = query.data[5:]
-
-    #     sessions = available_sessions(update, context)
-
-    #     if sessions != []:
-    #         join_sessions(update, context)
-    #     else:
-    #         no_sessions(update, context)
-
     # join session
     elif query.data[:13] == "join_session_":
         session_id = query.data[13:]
@@ -183,10 +172,10 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         context.chat_data["initiator_telegram_handle"] = db.users.find_one(
             {"user_id": userid})["tele_handle"]
 
+        context.bot.send_message(chat_id=userid, text="Hi! @" + context.chat_data["tele_handle"] +" has joined your study session!")
         prompt_contact(update, context)
 
     return
-
 
 def handle_text(update, context):
     text = update.effective_message.text
