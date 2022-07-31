@@ -147,6 +147,8 @@ def update_user(update, context):
     if cursor == None:
         db.users.insert_one({"user_id": user_id, "tele_handle": tele_handle})
     else:
-        cursor["tele_handle"] = tele_handle
+        filter_con = {"user_id": user_id}
+        new_con = {"$set": {"tele_handle": tele_handle}}
+        db.users.update_one(filter_con, new_con)
 
     return

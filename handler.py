@@ -231,6 +231,6 @@ def handle_text(update, context):
 
 def cancel(update: Update, context: CallbackContext):
     update.message.reply_text(
-        "Conversation cancelled by user. Send /begin to start again.")
+        "Conversation cancelled by user. Send /start to start again.")
 
     return ConversationHandler.END

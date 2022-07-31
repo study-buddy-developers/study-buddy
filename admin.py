@@ -9,8 +9,13 @@ from first_time import first_time, initiate_or_join
 def start(update: Update, context: CallbackContext):
     context.chat_data["state"] = "start"
 
-    update.message.reply_text(
-        "Hello there, Welcome to the Bot. Please write /help to see the commands available.")
+    context.chat_data["user_id"] = str(update.message.from_user.id)
+    context.chat_data["tele_handle"] = str(update.message.from_user.username)
+
+    print("user_id: " + context.chat_data["user_id"])
+    print("tele_handle: " + context.chat_data["tele_handle"])
+
+    user_identification(update, context)
 
     return
 
@@ -21,7 +26,7 @@ def help(update: Update, context: CallbackContext):
     update.message.reply_text(
         """
     Available Commands:
-    /begin - Start Study Buddy Telegram Bot
+    /start - Start Study Buddy Telegram Bot
     """
     )
 
@@ -32,7 +37,7 @@ def unknown_command(update: Update, context: CallbackContext):
     context.chat_data["state"] = "unknown_command"
 
     update.message.reply_text(
-        "Sorry '%s' is not a valid command" % update.message.text)
+        "Sorry \"%s\" is not a valid command" % update.message.text)
 
     return
 
@@ -41,21 +46,7 @@ def unknown_text(update: Update, context: CallbackContext):
     context.chat_data["state"] = "unknown_text"
 
     update.message.reply_text(
-        "Sorry I can't recognize you , you said '%s'. Please use /begin to start again." % update.message.text)
-
-    return
-
-
-def begin(update, context):
-    context.chat_data["state"] = "begin"
-
-    context.chat_data["user_id"] = str(update.message.from_user.id)
-    context.chat_data["tele_handle"] = str(update.message.from_user.username)
-
-    print("user_id: " + context.chat_data["user_id"])
-    print("tele_handle: " + context.chat_data["tele_handle"])
-
-    user_identification(update, context)
+        "Sorry I can't recognize you , you said \"%s\". Please use /start to start again." % update.message.text)
 
     return
 
@@ -69,7 +60,7 @@ def user_identification(update, context):
         first_time(update, context)
     else:
         update.message.reply_text(
-            "Welcome back " + cursor["tele_handle"] + "! What do we planned for this week?")
+            "Welcome back " + context.chat_data["tele_handle"] + "! What do we planned for this week?")
 
         initiate_or_join(update, context)
 
@@ -151,21 +142,11 @@ def valid_session(session):
     cursor = db.sessions.find_one({"_id": session})
 
     pax = len(cursor["user_id_array"])
-    total_pax = cursor["pax"][-1]
+    total_pax = int(cursor["pax"][-1])
 
     if pax == total_pax:
         return False
     return True
-
-
-# def valid_time(update, context, time):
-#     date = context.chat_data["join_date"]
-
-#     cursor = db.dates.find(
-#         {"$and": [{"date": date}, {time: {"$not": {"$size": 0}}}]})
-#     if list(cursor) == []:
-#         return False
-#     return True
 
 
 def available_sessions(update, context):
