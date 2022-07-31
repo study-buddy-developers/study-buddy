@@ -136,6 +136,11 @@ def initiate_or_join(update, context):
     return
 
 
+###
+# helper functions
+###
+
+
 def update_user(update, context):
     context.chat_data["state"] = "update_user"
 
@@ -145,7 +150,8 @@ def update_user(update, context):
     cursor = db.users.find_one({"user_id": user_id})
 
     if cursor == None:
-        db.users.insert_one({"user_id": user_id, "tele_handle": tele_handle})
+        db.users.insert_one({"user_id": user_id, "tele_handle": tele_handle, "year": "",
+                            "course": "", "gender": "", "location": "", "pax": "", "remarks": ""})
     else:
         filter_con = {"user_id": user_id}
         new_con = {"$set": {"tele_handle": tele_handle}}

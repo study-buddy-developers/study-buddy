@@ -2,24 +2,8 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext, ConversationHandler
 from datetime import datetime, timedelta
 
-
-def gender(update, context):
-    context.chat_data["state"] = "gender"
-
-    keyboard = [
-        [
-            InlineKeyboardButton("Male", callback_data="male"),
-            InlineKeyboardButton("Female", callback_data="female"),
-            InlineKeyboardButton("Prefer not to say",
-                                 callback_data="gender_null")
-        ]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-
-    update.callback_query.message.reply_text(
-        "What is your gender? (Note that you will not have a say in the gender of your study buddies if you choose ‘prefer not to say’)", reply_markup=reply_markup)
-
-    return
+from pymongo import *
+from credentials import *
 
 
 def initiate_date(update, context):
@@ -77,6 +61,84 @@ def initiate_time(update, context):
 
     update.callback_query.message.reply_text(
         "What time would you like to have your study session", reply_markup=reply_markup)
+
+    return
+
+
+def update_data(update, context):
+    context.chat_data["state"] = "update_data"
+
+    stored_data = context.chat_data["stored_data"]
+
+    keyboard = []
+    for data in stored_data:
+        keyboard.append(
+            [
+                InlineKeyboardButton(parse_data(
+                    data), callback_data="update_" + data)
+            ]
+        )
+    keyboard.append([InlineKeyboardButton(
+        "Done", callback_data="update_done")])
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.callback_query.message.reply_text(
+        "We noted that you have stored the following data previously. Would you like to update them?", reply_markup=reply_markup)
+
+    return
+
+
+def edit_update_data(update, context):
+    context.chat_data["state"] = "edit_update_data"
+
+    stored_data = context.chat_data["stored_data"]
+
+    keyboard = []
+    for data in stored_data:
+        keyboard.append(
+            [
+                InlineKeyboardButton(parse_data(
+                    data), callback_data="update_" + data)
+            ]
+        )
+    keyboard.append([InlineKeyboardButton(
+        "Done", callback_data="update_done")])
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    query = update.callback_query
+    context.bot.edit_message_reply_markup(
+        chat_id=query.message.chat_id,
+        message_id=query.message.message_id,
+        reply_markup=reply_markup
+    )
+
+    return
+
+
+def year(update, context):
+    context.chat_data["state"] = "year"
+
+    keyboard = [
+        [
+            InlineKeyboardButton("Year One", callback_data="year_one"),
+            InlineKeyboardButton("Year Two", callback_data="year_two")
+        ],
+        [
+            InlineKeyboardButton("Year Three", callback_data="year_three"),
+            InlineKeyboardButton("Year Four", callback_data="year_four")
+        ],
+        [
+            InlineKeyboardButton("Year Five", callback_data="year_five")
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    try:
+        update.message.reply_text(
+            "What year are you in?", reply_markup=reply_markup)
+    except:
+        update.callback_query.message.reply_text(
+            "What year are you in?", reply_markup=reply_markup)
 
     return
 
@@ -143,32 +205,35 @@ def course(update, context):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.callback_query.message.reply_text(
-        "What is your course?", reply_markup=reply_markup)
+    try:
+        update.message.reply_text(
+            "What is your course?", reply_markup=reply_markup)
+    except:
+        update.callback_query.message.reply_text(
+            "What is your course?", reply_markup=reply_markup)
 
     return
 
 
-def year(update, context):
-    context.chat_data["state"] = "year"
+def gender(update, context):
+    context.chat_data["state"] = "gender"
 
     keyboard = [
         [
-            InlineKeyboardButton("Year One", callback_data="year_one"),
-            InlineKeyboardButton("Year Two", callback_data="year_two")
-        ],
-        [
-            InlineKeyboardButton("Year Three", callback_data="year_three"),
-            InlineKeyboardButton("Year Four", callback_data="year_four")
-        ],
-        [
-            InlineKeyboardButton("Year Five", callback_data="year_five")
+            InlineKeyboardButton("Male", callback_data="male"),
+            InlineKeyboardButton("Female", callback_data="female"),
+            InlineKeyboardButton("Prefer not to say",
+                                 callback_data="gender_null")
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.callback_query.message.reply_text(
-        "What year are you in?", reply_markup=reply_markup)
+    try:
+        update.message.reply_text(
+            "What is your gender? (Note that you will not have a say in the gender of your study buddies if you choose ‘prefer not to say’)", reply_markup=reply_markup)
+    except:
+        update.callback_query.message.reply_text(
+            "What is your gender? (Note that you will not have a say in the gender of your study buddies if you choose ‘prefer not to say’)", reply_markup=reply_markup)
 
     return
 
@@ -176,7 +241,11 @@ def year(update, context):
 def location(update, context):
     context.chat_data["state"] = "location"
 
-    update.callback_query.message.reply_text("Where would you like to study?")
+    try:
+        update.message.reply_text("Where would you like to study?")
+    except:
+        update.callback_query.message.reply_text(
+            "Where would you like to study?")
 
     return
 
@@ -200,8 +269,12 @@ def pax(update, context):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.message.reply_text(
-        "How many people would you like in your study session?", reply_markup=reply_markup)
+    try:
+        update.message.reply_text(
+            "How many people would you like in your study session?", reply_markup=reply_markup)
+    except:
+        update.callback_query.message.reply_text(
+            "How many people would you like in your study session?", reply_markup=reply_markup)
 
     return
 
@@ -219,8 +292,12 @@ def remark(update, context):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.callback_query.message.reply_text(
-        "Any additional remarks?", reply_markup=reply_markup)
+    try:
+        update.message.reply_text(
+            "Any additional remarks?", reply_markup=reply_markup)
+    except:
+        update.callback_query.message.reply_text(
+            "Any additional remarks?", reply_markup=reply_markup)
 
     return
 
@@ -243,25 +320,12 @@ def store_data(update, context):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    if context.chat_data["state"] == "add_remark":
-        # catch error when user clicks "remark_no" after "remark_yes"
-        try:
-            update.message.reply_text(
-                "Would you like your data to be stored?", reply_markup=reply_markup)
-        except:
-            update.callback_query.message.reply_text(
-                "Would you like your data to be stored?", reply_markup=reply_markup)
-    elif context.chat_data["state"] == "remark":
+    try:
+        update.message.reply_text(
+            "Would you like your data to be stored?", reply_markup=reply_markup)
+    except:
         update.callback_query.message.reply_text(
             "Would you like your data to be stored?", reply_markup=reply_markup)
-    # catch potential error
-    else:
-        try:
-            update.callback_query.message.reply_text(
-                "Would you like your data to be stored?", reply_markup=reply_markup)
-        except:
-            update.message.reply_text(
-                "Would you like your data to be stored?", reply_markup=reply_markup)
 
     context.chat_data["state"] = "store_data"
 
@@ -271,31 +335,47 @@ def store_data(update, context):
 def which_data(update, context):
     context.chat_data["state"] = "which_data"
 
-    keyboard = [
-        [
-            InlineKeyboardButton("Gender", callback_data="gender")
-        ],
-        [
-            InlineKeyboardButton("Course", callback_data="course")
-        ],
-        [
-            InlineKeyboardButton("Year", callback_data="year")
-        ],
-        [
-            InlineKeyboardButton("Location", callback_data="location")
+    stored_data = context.chat_data["stored_data"]
 
-        ],
-        [
-            InlineKeyboardButton("Pax", callback_data="pax")
-        ],
-        [
-            InlineKeyboardButton("Done", callback_data="done")
-        ]
-    ]
+    keyboard = []
+    for data in stored_data:
+        try:
+            context.chat_data[data]
+            keyboard.append([InlineKeyboardButton(
+                data.capitalize(), callback_data=data)])
+        except:
+            continue
+    keyboard.append([InlineKeyboardButton("Done", callback_data="store_done")])
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.callback_query.message.reply_text(
         "Which data would you like to store?", reply_markup=reply_markup)
+
+    return
+
+
+def edit_which_data(update, context):
+    context.chat_data["state"] = "edit_which_data"
+
+    stored_data = context.chat_data["stored_data"]
+
+    keyboard = []
+    for data in stored_data:
+        try:
+            context.chat_data[data]
+            keyboard.append([InlineKeyboardButton(
+                data.capitalize(), callback_data=data)])
+        except:
+            continue
+    keyboard.append([InlineKeyboardButton("Done", callback_data="store_done")])
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    query = update.callback_query
+    context.bot.edit_message_reply_markup(
+        chat_id=query.message.chat_id,
+        message_id=query.message.message_id,
+        reply_markup=reply_markup
+    )
 
     return
 
@@ -307,3 +387,135 @@ def end(update, context):
         "Your study session has been posted successfully! We will update you when someone joined your session")
 
     return ConversationHandler.END
+
+
+###
+# helper functions
+###
+
+
+def check_data(update, context):
+    cursor = db.users.find_one({"user_id": context.chat_data["user_id"]})
+
+    stored_data = []
+
+    data = ["year", "course", "gender", "location", "pax", "remarks"]
+
+    for d in data:
+        if cursor[d] != "":
+            stored_data.append(d)
+
+    context.chat_data["stored_data"] = stored_data
+
+    return stored_data
+
+
+def parse_data(data):
+    return data.capitalize()
+
+
+def next_data(update, context):
+    if "year" not in context.chat_data["stored_data"]:
+        year(update, context)
+        context.chat_data["stored_data"].append("year")
+    elif "course" not in context.chat_data["stored_data"]:
+        course(update, context)
+        context.chat_data["stored_data"].append("course")
+    elif "gender" not in context.chat_data["stored_data"]:
+        gender(update, context)
+        context.chat_data["stored_data"].append("gender")
+    elif "location" not in context.chat_data["stored_data"]:
+        location(update, context)
+        context.chat_data["stored_data"].append("location")
+    elif "pax" not in context.chat_data["stored_data"]:
+        pax(update, context)
+        context.chat_data["stored_data"].append("pax")
+    elif "remarks" not in context.chat_data["stored_data"]:
+        remark(update, context)
+        context.chat_data["stored_data"].append("remarks")
+    else:
+        store_data(update, context)
+
+    return
+
+
+def create_study_session(update, context):
+    # sessions
+    session_id = db.sessions.insert_one(
+        {"user_id_array": [context.chat_data["user_id"]]}).inserted_id
+    filter_con = {"_id": session_id}
+
+    new_con = {"$set": {"date": context.chat_data["initiate_date"]}}
+    db.sessions.update_one(filter_con, new_con)
+
+    new_con = {"$set": {"time": context.chat_data["initiate_time"]}}
+    db.sessions.update_one(filter_con, new_con)
+
+    try:
+        new_con = {"$set": {"year": context.chat_data["year"]}}
+    except:
+        cursor = db.users.find_one({"user_id": context.chat_data["user_id"]})
+        new_con = {"$set": {"year": cursor["year"]}}
+    db.sessions.update_one(filter_con, new_con)
+
+    try:
+        new_con = {"$set": {"course": context.chat_data["course"]}}
+    except:
+        cursor = db.users.find_one({"user_id": context.chat_data["user_id"]})
+        new_con = {"$set": {"course": cursor["course"]}}
+    db.sessions.update_one(filter_con, new_con)
+
+    try:
+        new_con = {"$set": {"gender": context.chat_data["gender"]}}
+    except:
+        cursor = db.users.find_one({"user_id": context.chat_data["user_id"]})
+        new_con = {"$set": {"gender": cursor["gender"]}}
+    db.sessions.update_one(filter_con, new_con)
+
+    try:
+        new_con = {"$set": {"location": context.chat_data["location"]}}
+    except:
+        cursor = db.users.find_one({"user_id": context.chat_data["user_id"]})
+        new_con = {"$set": {"location": cursor["location"]}}
+    db.sessions.update_one(filter_con, new_con)
+
+    try:
+        new_con = {"$set": {"pax": context.chat_data["pax"]}}
+    except:
+        cursor = db.users.find_one({"user_id": context.chat_data["user_id"]})
+        new_con = {"$set": {"pax": cursor["pax"]}}
+    db.sessions.update_one(filter_con, new_con)
+
+    try:
+        new_con = {"$set": {"remarks": context.chat_data["remarks"]}}
+    except:
+        cursor = db.users.find_one({"user_id": context.chat_data["user_id"]})
+        new_con = {"$set": {"remarks": cursor["remarks"]}}
+    db.sessions.update_one(filter_con, new_con)
+
+    # dates
+    cursor = db.dates.find({"date": context.chat_data["initiate_date"]})
+    if list(cursor) == []:
+        date_id = db.dates.insert_one(
+            {"date": context.chat_data["initiate_date"]}).inserted_id
+        filter_con = {"_id": date_id}
+
+        new_con = {"$set": {"sessions": [session_id]}}
+        db.dates.update_one(filter_con, new_con)
+    else:
+        filter_con = {"date": context.chat_data["initiate_date"]}
+        new_con = {"$push": {"sessions": session_id}}
+        db.dates.update_one(filter_con, new_con)
+
+
+def purge_data(update, context):
+    # context._chat_id_and_data[1] = ""
+
+    context.chat_data["gender"] = ""
+    context.chat_data["course"] = ""
+    context.chat_data["year"] = ""
+    context.chat_data["location"] = ""
+    context.chat_data["pax"] = ""
+    context.chat_data["remarks"] = ""
+
+    return

@@ -1,8 +1,10 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from datetime import datetime, timedelta
+from bson.objectid import ObjectId
 
-from admin import valid_date, available_sessions
+from pymongo import *
+from credentials import *
 
 
 def join_date(update, context):
@@ -78,3 +80,90 @@ def prompt_contact(update, context):
         "Please kindly contact your initiator @" + contact)
 
     return
+
+
+###
+# helper functions
+###
+
+
+def valid_date(date):
+    cursor = db.dates.find_one({"date": date})
+
+    if cursor == None:
+        return False
+
+    sessions = cursor["sessions"]
+
+    for session in sessions:
+        if valid_session(session):
+            return True
+    return False
+
+
+def valid_session(session):
+    cursor = db.sessions.find_one({"_id": session})
+
+    pax = len(cursor["user_id_array"])
+    total_pax = int(cursor["pax"][-1])
+
+    if pax == total_pax:
+        return False
+    return True
+
+
+def available_sessions(update, context):
+    date = context.chat_data["join_date"]
+
+    cursor = db.dates.find_one({"date": date})
+
+    sessions = cursor["sessions"]
+
+    valid_sessions = []
+    for session in sessions:
+        if valid_session(session):
+            cursor = db.sessions.find_one({"_id": session})
+
+            # year
+            if cursor["year"] == "year_one":
+                year = "Y1"
+            elif cursor["year"] == "year_two":
+                year = "Y2"
+            elif cursor["year"] == "year_three":
+                year = "Y3"
+            elif cursor["year"] == "year_four":
+                year = "Y4"
+            elif cursor["year"] == "year_five":
+                year = "Y5"
+
+            # course
+            course = cursor["course"].split("_")[1]
+
+            # gender
+            gender = cursor["gender"]
+
+            # time
+            time = cursor["time"]
+
+            # location
+            location = cursor["location"]
+
+            # current pax
+            current_pax = len(cursor["user_id_array"])
+
+            # pax
+            pax = cursor["pax"][-1]
+
+            # remarks
+            remarks = cursor["remarks"]
+
+            if gender == "gender_null":
+                session_details = [str(year) + " " + str(course) + ", " + str(date) + " " + str(time) + "H @" + str(
+                    location) + " (Remarks: " + str(remarks) + ") (" + str(current_pax) + "/" + str(pax) + " pax)", session]
+            else:
+                session_details = [str(year) + " " + str(course) + ", " + str(gender).capitalize() + ", " + str(date) + " " + str(
+                    time) + "H @" + str(location) + " (Remarks: " + str(remarks) + ") (" + str(current_pax) + "/" + str(pax) + " pax)", session]
+
+            valid_sessions.append(session_details)
+
+    return valid_sessions

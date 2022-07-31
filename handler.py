@@ -27,7 +27,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # initiate_or_join
     elif query.data == "initiate":
-        gender(update, context)
+        initiate_date(update, context)
     elif query.data == "join":
         for i in range(7):
             curr_date = datetime.now() + timedelta(days=i)
@@ -42,12 +42,6 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
                 return
 
         no_sessions(update, context)
-
-    # gender
-    elif query.data == "male" or query.data == "female" or query.data == "gender_null":
-        context.chat_data["gender"] = query.data
-
-        initiate_date(update, context)
 
     # initiate date
     elif query.data == "date_1" or query.data == "date_2" or query.data == "date_3" or query.data == "date_4" or query.data == "date_5" or query.data == "date_6" or query.data == "date_7":
@@ -67,25 +61,43 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     elif query.data[2:] == "00":
         context.chat_data["initiate_time"] = query.data
 
-        course(update, context)
+        check_data(update, context)
+        update_data(update, context)
+
+    # update_data_done
+    elif query.data == "update_done":
+        next_data(update, context)
+
+    # update_data
+    elif query.data[:7] == "update_":
+        data = query.data[7:]
+        context.chat_data["stored_data"].remove(data)
+
+        edit_update_data(update, context)
+
+    # year
+    elif query.data[:5] == "year_":
+        context.chat_data["year"] = query.data
+
+        next_data(update, context)
 
     # course
     elif query.data[0:3] == "CDE":
         context.chat_data["course"] = query.data
 
-        year(update, context)
+        next_data(update, context)
 
-    # year
-    elif query.data == "year_one" or query.data == "year_two" or query.data == "year_three" or query.data == "year_four" or query.data == "year_five":
-        context.chat_data["year"] = query.data
+    # gender
+    elif query.data == "male" or query.data == "female" or query.data == "gender_null":
+        context.chat_data["gender"] = query.data
 
-        location(update, context)
+        next_data(update, context)
 
     # pax
     elif query.data == "pax_2" or query.data == "pax_3" or query.data == "pax_4" or query.data == "pax_5":
         context.chat_data["pax"] = query.data
 
-        remark(update, context)
+        next_data(update, context)
 
     # remark_yes or remark_no
     elif query.data == "remark_yes":
@@ -108,13 +120,17 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         end(update, context)
 
     # which data
-    elif query.data == "gender" or query.data == "course" or query.data == "year" or query.data == "location" or query.data == "pax":
+    elif query.data == "gender" or query.data == "course" or query.data == "year" or query.data == "location" or query.data == "pax" or query.data == "remarks":
         # handle store data
         filter_con = {"user_id": context.chat_data["user_id"]}
         new_con = {"$set": {query.data: context.chat_data[query.data]}}
         db.users.update_one(filter_con, new_con)
 
-    elif query.data == "done":
+        context.chat_data["stored_data"].remove(query.data)
+
+        edit_which_data(update, context)
+
+    elif query.data == "store_done":
         create_study_session(update, context)
 
         purge_data(update, context)
@@ -162,18 +178,8 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
             newcon = {"$push": {"user_id_array": joiner_id}}
             db.sessions.update_one(filtercon, newcon)
 
-        # contact = db.users.find_one({"user_id":userid})["tele_handle"]
         context.chat_data["initiator_telegram_handle"] = db.users.find_one(
             {"user_id": userid})["tele_handle"]
-
-        # print(len(cursor["user_id_array"]))
-        # print(int(cursor["pax"][-1]))
-        # print(type(len(cursor["user_id_array"])))
-        # print(type(int(cursor["pax"][-1])))
-        # if len(cursor["user_id_array"]) == int(cursor["pax"][-1]): #not executed!!!
-        #     print("attempting to delete")
-        #     db.dates.update_one( {"date":cursor["date"]}, { "$pull": { cursor["time"]:ObjectId(session_id)} } )
-        #     print("deleted")
 
         prompt_contact(update, context)
 
@@ -199,12 +205,6 @@ def handle_text(update, context):
     elif (state == "verification" or state == "new_code"):
         code(update, context)
 
-    # course DEPRECATED
-    elif (state == "course") and text.isalpha():
-        context.chat_data["course"] = text
-
-        year(update, context)
-
     # location
     elif state == "location":
         context.chat_data["location"] = text
@@ -214,7 +214,7 @@ def handle_text(update, context):
         newcon = {"$set": {"tele_handle": context.chat_data["tele_handle"]}}
         db.users.update_one(filtercon, newcon)
 
-        pax(update, context)
+        next_data(update, context)
 
     # remark
     elif state == "add_remark":
