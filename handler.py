@@ -210,11 +210,6 @@ def handle_text(update, context):
     elif state == "location":
         context.chat_data["location"] = text
 
-        # store telehandle in user db
-        filtercon = {"user_id": context.chat_data["user_id"]}
-        newcon = {"$set": {"tele_handle": context.chat_data["tele_handle"]}}
-        db.users.update_one(filtercon, newcon)
-
         next_data(update, context)
 
     # remark
