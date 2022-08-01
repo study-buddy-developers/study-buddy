@@ -430,6 +430,8 @@ def next_data(update, context):
                 context.chat_data["stored_data"].append("remarks")
             return
 
+    print(context.chat_data["state"])
+
     store_data(update, context)
 
     return

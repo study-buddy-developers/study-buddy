@@ -68,7 +68,14 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # update_data_done
     elif query.data == "update_done":
-        next_data(update, context)
+        if context.chat_data["state"] == "update_data":
+            create_study_session(update, context)
+
+            purge_data(update, context)
+
+            end(update, context)
+        else:
+            next_data(update, context)
 
     # update_data
     elif query.data[:7] == "update_":
@@ -172,10 +179,12 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         context.chat_data["initiator_telegram_handle"] = db.users.find_one(
             {"user_id": userid})["tele_handle"]
 
-        context.bot.send_message(chat_id=userid, text="Hi! @" + context.chat_data["tele_handle"] +" has joined your study session!")
+        context.bot.send_message(chat_id=userid, text="Hi! @" +
+                                 context.chat_data["tele_handle"] + " has joined your study session!")
         prompt_contact(update, context)
 
     return
+
 
 def handle_text(update, context):
     text = update.effective_message.text
