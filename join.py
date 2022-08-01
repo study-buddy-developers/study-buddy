@@ -112,6 +112,18 @@ def valid_session(update, context, session):
 
     if pax == total_pax:
         return False
+
+    curr_date = datetime.now()
+    curr_day = str(curr_date.day)
+    curr_month = str(curr_date.month)
+    curr_year = str(curr_date.year)
+    curr_time = curr_date.hour * 100 + curr_date.minute
+
+    date = curr_day + "/" + curr_month + "/" + curr_year
+
+    if cursor["date"] == date and int(cursor["time"]) <= curr_time:
+        return False
+
     return True
 
 
