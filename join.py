@@ -23,7 +23,7 @@ def join_date(update, context):
 
         date = curr_day + "/" + curr_month + "/" + curr_year
 
-        if valid_date(date):
+        if valid_date(update, context, date):
             keyboard[row].append(InlineKeyboardButton(
                 date, callback_data="join_date_"+str(i)))
 
@@ -45,7 +45,7 @@ def no_sessions(update, context):
     context.chat_data["state"] = "no_sessions"
 
     keyboard = [
-        [InlineKeyboardButton("initiate", callback_data="initiate")]
+        [InlineKeyboardButton("Initiate", callback_data="initiate")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -87,7 +87,7 @@ def prompt_contact(update, context):
 ###
 
 
-def valid_date(date):
+def valid_date(update, context, date):
     cursor = db.dates.find_one({"date": date})
 
     if cursor == None:
@@ -96,13 +96,16 @@ def valid_date(date):
     sessions = cursor["sessions"]
 
     for session in sessions:
-        if valid_session(session):
+        if valid_session(update, context, session):
             return True
     return False
 
 
-def valid_session(session):
+def valid_session(update, context, session):
     cursor = db.sessions.find_one({"_id": session})
+
+    if context.chat_data["user_id"] in cursor["user_id_array"]:
+        return False
 
     pax = len(cursor["user_id_array"])
     total_pax = int(cursor["pax"][-1])
@@ -121,7 +124,7 @@ def available_sessions(update, context):
 
     valid_sessions = []
     for session in sessions:
-        if valid_session(session):
+        if valid_session(update, context, session):
             cursor = db.sessions.find_one({"_id": session})
 
             # year

@@ -37,7 +37,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
             date = curr_day + "/" + curr_month + "/" + curr_year
 
-            if valid_date(date):
+            if valid_date(update, context, date):
                 join_date(update, context)
                 return
 
