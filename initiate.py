@@ -378,6 +378,10 @@ def edit_which_data(update, context):
 def end(update, context):
     context.chat_data["state"] = "end"
 
+    create_study_session(update, context)
+
+    purge_data(update, context)
+
     update.callback_query.message.reply_text(
         "Your study session has been posted successfully! We will update you when someone joined your session")
 
@@ -429,8 +433,6 @@ def next_data(update, context):
                 remark(update, context)
                 context.chat_data["stored_data"].append("remarks")
             return
-
-    print(context.chat_data["state"])
 
     store_data(update, context)
 

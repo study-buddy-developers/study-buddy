@@ -69,10 +69,6 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     # update_data_done
     elif query.data == "update_done":
         if context.chat_data["state"] == "update_data":
-            create_study_session(update, context)
-
-            purge_data(update, context)
-
             end(update, context)
         else:
             next_data(update, context)
@@ -122,10 +118,6 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     elif query.data == "store_data_yes":
         which_data(update, context)
     elif query.data == "store_data_no":
-        create_study_session(update, context)
-
-        purge_data(update, context)
-
         end(update, context)
 
     # which data
@@ -140,10 +132,6 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
         edit_which_data(update, context)
 
     elif query.data == "store_done":
-        create_study_session(update, context)
-
-        purge_data(update, context)
-
         end(update, context)
 
     # join date
