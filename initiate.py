@@ -41,26 +41,27 @@ def initiate_date(update, context):
 def initiate_time(update, context):
     context.chat_data["state"] = "time"
 
-    keyboard = [
-        [
-            InlineKeyboardButton("0900", callback_data="0900"),
-            InlineKeyboardButton("1000", callback_data="1000"),
-            InlineKeyboardButton("1100", callback_data="1100"),
-            InlineKeyboardButton("1200", callback_data="1200"),
-            InlineKeyboardButton("1300", callback_data="1300")
-        ],
-        [
-            InlineKeyboardButton("1400", callback_data="1400"),
-            InlineKeyboardButton("1500", callback_data="1500"),
-            InlineKeyboardButton("1600", callback_data="1600"),
-            InlineKeyboardButton("1700", callback_data="1700"),
-            InlineKeyboardButton("1800", callback_data="1800")
-        ]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    try:
+        update.message.reply_text(
+            "What time would you like to have your study session? (Please key in a time in 24 hour format e.g. 1400)")
+    except:
+        update.callback_query.message.reply_text(
+            "What time would you like to have your study session? (Please key in a time in 24 hour format e.g. 1400)")
 
-    update.callback_query.message.reply_text(
-        "What time would you like to have your study session", reply_markup=reply_markup)
+    return
+
+
+def invalid_initiate_time(update, context, reason):
+    context.chat_data["state"] = "invalid_initiate_time"
+
+    try:
+        update.message.reply_text(
+            "Sorry, you keyed in an invalid time. (Reason: " + reason + ")")
+    except:
+        update.callback_query.message.reply_text(
+            "Sorry, you keyed in an invalid time. (Reason: " + reason + ")")
+
+    initiate_time(update, context)
 
     return
 
@@ -82,8 +83,12 @@ def update_data(update, context):
         "Done", callback_data="update_done")])
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.callback_query.message.reply_text(
-        "We noted that you have stored the following data previously. Would you like to update them?", reply_markup=reply_markup)
+    try:
+        update.message.reply_text(
+            "We noted that you have stored the following data previously. Would you like to update them?", reply_markup=reply_markup)
+    except:
+        update.callback_query.message.reply_text(
+            "We noted that you have stored the following data previously. Would you like to update them?", reply_markup=reply_markup)
 
     return
 
@@ -391,6 +396,19 @@ def end(update, context):
 ###
 # helper functions
 ###
+
+def valid_time(update, context, text):
+    curr_date = datetime.now()
+    curr_day = str(curr_date.day)
+    curr_month = str(curr_date.month)
+    curr_year = str(curr_date.year)
+    curr_time = curr_date.hour * 100 + curr_date.minute
+
+    date = curr_day + "/" + curr_month + "/" + curr_year
+
+    if context.chat_data["initiate_date"] == date and int(text) <= curr_time:
+        return False
+    return True
 
 
 def check_data(update, context):

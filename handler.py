@@ -57,15 +57,6 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
         initiate_time(update, context)
 
-    # initiate time
-    elif query.data[2:] == "00":
-        context.chat_data["initiate_time"] = query.data
-
-        if len(check_data(update, context)) == 0:
-            next_data(update, context)
-        else:
-            update_data(update, context)
-
     # update_data_done
     elif query.data == "update_done":
         if context.chat_data["state"] == "update_data":
@@ -192,6 +183,28 @@ def handle_text(update, context):
     # verification code
     elif (state == "verification" or state == "new_code"):
         code(update, context)
+
+    # initiate time
+    elif state == "time":
+        if len(text) > 4:
+            invalid_initiate_time(
+                update, context, "Text more than 4 digits")
+        elif len(text) < 4:
+            invalid_initiate_time(
+                update, context, "Text less than 4 digits")
+        elif [text[i].isdigit() for i in range(4)] != [True, True, True, True]:
+            invalid_initiate_time(
+                update, context, "Text contains non-digits")
+        elif not valid_time(update, context, text):
+            invalid_initiate_time(
+                update, context, "Inititate time before current time")
+        else:
+            context.chat_data["initiate_time"] = text
+
+            if len(check_data(update, context)) == 0:
+                next_data(update, context)
+            else:
+                update_data(update, context)
 
     # location
     elif state == "location":
