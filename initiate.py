@@ -480,6 +480,15 @@ def create_study_session(update, context):
             new_con = {"$set": {d: cursor[d]}}
         db.sessions.update_one(filter_con, new_con)
 
+    # users
+    filter_con = {"user_id":context.chat_data["user_id"]}
+    cursor = db.users.find_one({"$and":[{"user_id": context.chat_data["user_id"]},{"sessions_initiated": { "$exists": "True" }}]})
+    if (not cursor) or cursor["sessions_initiated"] == []:
+        new_con = {"$set":{"sessions_initiated":[session_id]}}
+    else:
+        new_con = {"$push":{"sessions_initiated":session_id}}
+    db.users.update_one(filter_con, new_con) 
+
     # dates
     cursor = db.dates.find({"date": context.chat_data["initiate_date"]})
     if list(cursor) == []:

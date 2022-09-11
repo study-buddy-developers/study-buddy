@@ -118,12 +118,24 @@ def initiate_or_join(update, context):
 
     context.chat_data["state"] = "initiate_or_join"
 
-    keyboard = [
-        [
-            InlineKeyboardButton("Initiate", callback_data="initiate"),
-            InlineKeyboardButton("Join", callback_data="join")
+    user_id = context.chat_data["user_id"]
+    cursor = db.users.find_one({"$and":[{"user_id": user_id},{"sessions_initiated": { "$exists": "True" }}]})
+    if cursor and cursor["sessions_initiated"]!=[]:
+        keyboard = [
+            [
+                InlineKeyboardButton("Initiate", callback_data="initiate"),
+                InlineKeyboardButton("Join", callback_data="join"),
+                InlineKeyboardButton("Edit sessions", callback_data="edit_sessions"),
+                InlineKeyboardButton("Delete sessions", callback_data="delete_sessions"),
+            ]
         ]
-    ]
+    else:
+        keyboard = [
+            [
+                InlineKeyboardButton("Initiate", callback_data="initiate"),
+                InlineKeyboardButton("Join", callback_data="join")
+            ]
+        ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     try:
