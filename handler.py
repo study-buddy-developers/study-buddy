@@ -59,7 +59,7 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
 
     # update_data_done
     elif query.data == "update_done":
-        if context.chat_data["state"] == "update_data":
+        if len(context.chat_data["stored_data"]) == 6:
             end(update, context)
         else:
             next_data(update, context)
