@@ -117,7 +117,6 @@ def initiate_or_join(update, context):
     update_user(update, context)
 
     context.chat_data["state"] = "initiate_or_join"
-
     user_id = context.chat_data["user_id"]
     cursor = db.users.find_one({"$and":[{"user_id": user_id},{"sessions_initiated": { "$exists": "True" }}]})
     if cursor and cursor["sessions_initiated"]!=[]:

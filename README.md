@@ -25,6 +25,12 @@ git clone https://github.com/study-buddy-developers/study-buddy.git
 # change the working directory
 cd study-buddy
 
+# Create Env
+python3 -m venv .venv
+
+# Enter Env
+source .venv/bin/activate
+
 # install the requirements
 python3 -m pip install -r requirements.txt
 
