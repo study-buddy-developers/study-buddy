@@ -1,3 +1,4 @@
+import imp
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from datetime import datetime, timedelta
@@ -9,6 +10,8 @@ from first_time import *
 from initiate import *
 from join import *
 from credentials import *
+from edit_sessions import *
+from delete_sessions import *
 
 
 def handle_callback_query(update: Update, context: CallbackContext) -> None:
@@ -162,6 +165,20 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
                                  context.chat_data["tele_handle"] + " has joined your study session!")
         prompt_contact(update, context)
 
+    # edit or view existing sessions       
+    elif query.data[0:18] == "editable_sessions_":  #editable_sessions_view or editable_sessions_edit
+        display_sessions(update,context,query.data[18:]) #edit or view
+    
+    elif query.data[0:12] == "edit_session":
+        display_session_details(update,context, query.data[12:])
+
+    #delete existing sessions
+    elif query.data == "deletable_sessions": 
+        display_sessions(update,context,"delete") #delete
+    
+    elif query.data[0:14] == "delete_session":
+        delete_sessions(update,context, query.data[14:])
+
     return
 
 
@@ -201,16 +218,17 @@ def handle_text(update, context):
         else:
             context.chat_data["initiate_time"] = text
 
-            if len(check_data(update, context)) == 0:
-                next_data(update, context)
-            else:
-                update_data(update, context)
+            location(update,context)
 
     # location
     elif state == "location":
         context.chat_data["location"] = text
 
-        next_data(update, context)
+        if len(check_data(update, context)) == 0:
+            next_data(update, context)
+            
+        else:
+            update_data(update, context)
 
     # remark
     elif state == "add_remark":

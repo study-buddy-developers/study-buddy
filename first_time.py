@@ -124,9 +124,18 @@ def initiate_or_join(update, context):
         keyboard = [
             [
                 InlineKeyboardButton("Initiate", callback_data="initiate"),
+            ],
+            [    
                 InlineKeyboardButton("Join", callback_data="join"),
-                InlineKeyboardButton("Edit sessions", callback_data="edit_sessions"),
-                InlineKeyboardButton("Delete sessions", callback_data="delete_sessions"),
+            ],
+            [
+                InlineKeyboardButton("Edit sessions", callback_data="editable_sessions_edit"),
+            ],    
+            [    
+                InlineKeyboardButton("View upcoming sessions", callback_data="editable_sessions_view"),
+            ],    
+            [   
+                InlineKeyboardButton("Delete sessions", callback_data="deletable_sessions"),
             ]
         ]
     else:
@@ -146,7 +155,6 @@ def initiate_or_join(update, context):
             "Greetings! Would you like to join a study session or initiate one yourself?", reply_markup=reply_markup)
 
     return
-
 
 ###
 # helper functions
