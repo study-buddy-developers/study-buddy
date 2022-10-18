@@ -174,10 +174,10 @@ def available_sessions(update, context):
 
             if gender == "gender_null":
                 session_details = [str(year) + " " + str(course) + ", " + str(date) + " " + str(time) + "H @" + str(
-                    location) + " (Remarks: " + str(remarks) + ") (" + str(current_pax) + "/" + str(pax) + " pax)", session]
+                    location) + "\n" + " (Remarks: " + str(remarks) + ") (" + str(current_pax) + "/" + str(pax) + " pax)", session]
             else:
                 session_details = [str(year) + " " + str(course) + ", " + str(gender).capitalize() + ", " + str(date) + " " + str(
-                    time) + "H @" + str(location) + " (Remarks: " + str(remarks) + ") (" + str(current_pax) + "/" + str(pax) + " pax)", session]
+                    time) + "H @" + str(location) + "\n" +  " (Remarks: " + str(remarks) + ") (" + str(current_pax) + "/" + str(pax) + " pax)", session]
 
             valid_sessions.append(session_details)
 

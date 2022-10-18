@@ -176,8 +176,8 @@ def handle_callback_query(update: Update, context: CallbackContext) -> None:
     elif query.data == "deletable_sessions": 
         display_sessions(update,context,"delete") #delete
     
-    elif query.data[0:14] == "delete_session":
-        delete_sessions(update,context, query.data[14:])
+    # elif query.data[0:14] == "delete_session":
+    #     delete_sessions(update,context, query.data[14:])
 
     return
 
@@ -224,6 +224,11 @@ def handle_text(update, context):
     elif state == "location":
         context.chat_data["location"] = text
 
+        filtercon = {"user_id": context.chat_data["user_id"]}
+        new_con = {"$set": {"location": text}}
+        db.sessions.update_one(filtercon, new_con)
+        db.users.update_one(filtercon, new_con)
+        
         if len(check_data(update, context)) == 0:
             next_data(update, context)
             
